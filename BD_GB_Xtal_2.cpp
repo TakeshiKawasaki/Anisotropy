@@ -345,10 +345,10 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    
 	    //start derivation
 	    
-	    drU = 4.*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr/e2/r4)*(R2p_pr+R2n_pr)-(aij*aij*chi*B/2./r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
-	    diU = 4.*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr+R1n_pr)-(aij*aij*aij*chi*B/2./r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
-        djU = 4.*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr-R1n_pr)-(aij*aij*aij*chi*B/2./r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
-        dcU = 4.*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr*chi_pr/2./e2/r2)*(R1p_pr*R1p_pr+R1n_pr*R1n_pr)-(aij*aij*aij*chi*chi*B/4./r2)*(R1p*R1p-R1n*R1p)+A*eta*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
+	    drU = 4.*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr)/e2/r4)*(R2p_pr+R2n_pr)-((aij_pr*aij_pr*aij_pr*chi*B)/2./r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
+	    diU = 4.*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr+R1n_pr)-((aij_pr*aij_pr*aij_pr*chi*B)/2./r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
+        djU = 4.*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr-R1n_pr)-((aij_pr*aij_pr*aij_pr*chi*B)/2./r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
+        dcU = 4.*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr*chi_pr)/2./e2/r2)*(R1p_pr*R1p_pr-R1n_pr*R1n_pr)-((aij_pr*aij_pr*aij_pr*chi*chi*B)/4./r2)*(R1p*R1p-R1n*R1p)+A*eta*chi*chi*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
     
 	    fx_ij= drU*dx/r+diU*cos(theta[i])+djU*cos(theta[list[i][j]]);
 	    fy_ij= drU*dy/r+diU*sin(theta[i])+djU*sin(theta[list[i][j]]);
@@ -360,7 +360,7 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    ky[list[i][j]]-=fy_ij;
 	    
 	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
-	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(-cos(theta[i])*sin(theta[list[i][j]])+sin(theta[i])*cos(theta[list[i][j]]));
+	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
 	    U1=4.*e1*e2*A;
 	  }
         }
