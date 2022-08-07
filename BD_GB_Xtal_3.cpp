@@ -295,8 +295,8 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
     {
       for (j = 1; j <=list[i][0]; j++)
 	{
-          dx = x[list[i][j]] - x[i];
-          dy = y[list[i][j]] - y[i];
+          dx = x[i] - x[list[i][j]];
+          dy = y[i] - y[list[i][j]];
           if (dx > (0.5 * L))
             dx -= L;
           if (dx < -(0.5 * L))
