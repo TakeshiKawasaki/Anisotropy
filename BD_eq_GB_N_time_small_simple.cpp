@@ -170,23 +170,27 @@ double gaussian_rand(void)
     return gset;
   }
 }
-int ini_coord_rand(double* x, double* y, double* a, int Np, double L, double r1, double r2,double* theta){
-  int k, p;
- p = 0;
- srandom(time(0));
 
-  for (k = 0; k < Np/2; k++) {
-    x[2*k] = unif_rand(0, 1) * L;
-    y[2*k] = unif_rand(0, 1) * L;
-    theta[2*k] = unif_rand(0, 1) * pi;
-    a[2*k] = r1;
-    x[2*k+1] = unif_rand(0, 1) * L;
-    y[2*k+1] = unif_rand(0, 1) * L;
-    theta[2*k+1] = unif_rand(0, 1) * pi;
-    a[2*k+1] = r2;
+
+void ini_coord_square(double *x,double *y,double *theta,double *a,double L,int Np){
+  int num_x = (int)sqrt(Np)+1;
+  int num_y = (int)sqrt(Np)+1;
+  int i,j,k=0;
+  for(j=0;j<num_y;j++){
+    for(i=0;i<num_x;i++){
+      x[i+num_x*j] = i*L/(double)num_x;
+      y[i+num_x*j] = j*L/(double)num_y;
+      theta[i+num_x*j]=M_PI/4.0;
+      a[i+num_x*j]=0.0;
+      k++;
+      if(k>=Np)
+        break;
+    }
+    if(k>=Np)
+      break;
   }
-  return 0;
 }
+
 int ini(double* vx, double* vy, int Np, double* omega) {
   int j;
   for (j = 0; j < Np; j++) {
@@ -383,11 +387,11 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
           if (dy < -(0.5 * L))
             dy += L;
           aij = (a[list[i][j]] + a[i]) / 2.0;
-	  
+	  cout<<theta[list[i][j]]<<endl;
           r = sqrt(dx*dx+dy*dy);
           r2 = dx*dx+dy*dy;
           r4 = r2*r2;
-	  if(r2< 3.0*3.0){  // the force by potential energy would work if the distance is smaller than 3*(charcteristic length) maybe i better put it just after calculating r??
+	  if(r2< 7.0*7.0){  // the force by potential energy would work if the distance is smaller than 3*(charcteristic length) maybe i better put it just after calculating r??
 	    
 	    ri = dx*cos(theta[i])+dy*sin(theta[i]);
 	    rj = dx*cos(theta[list[i][j]])+dy*sin(theta[list[i][j]]);
@@ -403,8 +407,7 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    R2n_pr =(ri-rj)*(ri-rj)/(1+chi_pr*cij);
 	    R1p_pr =(ri+rj)/(1+chi_pr*cij);
 	    R1n_pr =(ri-rj)/(1+chi_pr*cij);    
-	    
-	    
+	    	    
 	    aij_pr = aij/sqrt(1-(chi/2/r2)*(R2p+R2n));
 	    
 	    A1 = (aij/(r-aij_pr+aij));
@@ -413,10 +416,11 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    A12 = A6*A6;
 	    
 	    A = A12-A6;
-	    B = 13.*A12*A1-7*A6*A1;
+	    B = 13.*A12*A1-7.*A6*A1;
 	    
 	    
-	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
+	    //	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
+	    e1 = 1/sqrt(1-chi*chi*cij*cij);  //epsilon1
 	    e2 = 1-(chi_pr/2/r2)*(R2p_pr+R2n_pr); // epsilon2
 	    
 	    
@@ -474,21 +478,21 @@ int main(int argc, char *argv[])
 
   double disp_max=0.0;
   double disp_ave=0.0;
-  int Np = 200;int count_th=200;
+  int Np = 1000;int count_th=200;
   double r1=1.0, r2=1.0;
   double disp_th =10.0;
-  double dt=0.01;//  //parameters;
+  double dt =0.0005;//  //parameters;
   double time_stable_1 = 100.;
   double time_stable_2 = 1000.;
   double Th;
-  double chi =0.; // atof(argv[1]);  // 0.8
-  double chi_pr = 0; // its not finalised, not sure if its right value 
+  double chi = 0.5; // atof(argv[1]);  // 0.8
+  double chi_pr = 0.5; // its not finalised, not sure if its right value 
   double eta = 1.;
   double mu = 2.;
   double timer;
   double chi0=0.2;
 
-  double RCHK=4.5;
+  double RCHK=9.0;
   double L = sqrt(double(Np)*pi*(r1*r1+r2*r2)/8.*pow(2.,0.333333)*pow((1.+2.*chi),1./6.) / 0.35); 
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
@@ -513,28 +517,13 @@ int main(int argc, char *argv[])
 
   char filename[128];
   
-  ini_coord_rand(x, y, a, Np, L, r1, r2,theta);
+  ini_coord_square(x,y,theta,a,L,Np);
   ini(vx, vy, Np,omega);  
   
   sprintf(filename,"%s/energy_time.txt",argv[1]);
   ofstream file;
   file.open(filename);
   
-  //HP//////////////////////////////////////
-  //  double chi0=0.2;
-  double RCHK1=3.0;
-  int M1=int(L/RCHK1);  
-  for (t = 0.; t < time_stable_1; t += dt) {
-    update(L,Np,x,y,M1,RCHK1,list);
-    calc_force_hs(x, y, L, Np, a, kx, ky,kth,list,theta,chi0);
-    eq_motion(x, y, theta, vx, vy, omega, dt, kx, ky,kth, Np, &avK, 0.0);
-    p_bound(x, y, Np, L);
-    //cout << t <<endl;
-
-  }
-
-  ///////////////////////////////////////////
-
   update(L,Np,x,y,M,RCHK,list);
   avU0=0.0;
 
@@ -551,7 +540,7 @@ int main(int argc, char *argv[])
       com_correction(x,y,&x_corr,&y_corr,Np, L);
       p_bound(x, y, Np, L);
      
-      cout <<"x="<<x[1]<<endl;      
+      cout <<"x="<<x[1]<<" "<<disp_ave<<endl;      
       if(disp_ave>disp_th*disp_th){ // the condition for changing temp
 	output(x,y,x_corr,y_corr,L,theta,a,Np); // does it mean every output has different temp??
 	break;
