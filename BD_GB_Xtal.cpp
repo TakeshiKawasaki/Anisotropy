@@ -275,8 +275,6 @@ void update(double L,int Np,double *x,double *y,int M,double RCHK,int (*list)[Pm
   delete []map;
 }
 
-
-
 int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, double* ky,double *kth,int (*list)[Pm],double *theta,double chi,double chi_pr,double mu,double eta) {
   int i, j, k;
   // *avU = 0.0;
@@ -308,7 +306,7 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
           if (dy < -(0.5 * L))
             dy += L;
           aij = (a[list[i][j]] + a[i]) / 2.0;
-	  // cout<<theta[list[i][j]]<<endl;
+	  cout<<theta[list[i][j]]<<endl;
           r = sqrt(dx*dx+dy*dy);
           r2 = dx*dx+dy*dy;
           r4 = r2*r2;
@@ -320,16 +318,16 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    
 	    
 	    R2p =(ri+rj)*(ri+rj)/(1+chi*cij);
-	    R2n =(ri-rj)*(ri-rj)/(1+chi*cij);
-	    R1p =(ri+rj)/(1+chi*cij);
-	    R1n =(ri-rj)/(1+chi*cij);
-	    
-	    R2p_pr =(ri+rj)*(ri+rj)/(1+chi_pr*cij);
-	    R2n_pr =(ri-rj)*(ri-rj)/(1+chi_pr*cij);
-	    R1p_pr =(ri+rj)/(1+chi_pr*cij);
-	    R1n_pr =(ri-rj)/(1+chi_pr*cij);    
+ 	    R2n =(ri-rj)*(ri-rj)/(1-chi*cij);
+ 	    R1p =(ri+rj)/(1+chi*cij);
+ 	    R1n =(ri-rj)/(1-chi*cij);
+
+ 	    R2p_pr =(ri+rj)*(ri+rj)/(1+chi_pr*cij);
+ 	    R2n_pr =(ri-rj)*(ri-rj)/(1-chi_pr*cij);
+ 	    R1p_pr =(ri+rj)/(1+chi_pr*cij);
+ 	    R1n_pr =(ri-rj)/(1-chi_pr*cij);    
 	    	    
-	    aij_pr = aij/sqrt(1-(chi/2/r2)*(R2p+R2n));
+	    aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
 	    
 	    A1 = (aij/(r-aij_pr+aij));
 	    A2 =A1*A1;
@@ -341,17 +339,17 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    
 	    
 	    //	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
-	    e1 = 1/sqrt(1-chi*chi*cij*cij);  //epsilon1
-	    e2 = (1-(chi_pr/2/r2)*(R2p_pr+R2n_pr))*(1-(chi_pr/2/r2)*(R2p_pr+R2n_pr)); // epsilon2
+	    e1 = 1./sqrt(1-chi*chi*cij*cij);  //epsilon1
+	    e2 = 1.-(chi_pr/2./r2)*(R2p_pr+R2n_pr); // epsilon2
 	    
 	    
 	    //start derivation
 	    
-	    drU = 4.*e1*e2*((A*mu*chi_pr/e2/r4)*(R2p_pr+R2n_pr)-(aij*aij*chi*B/2/r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
-	    diU = 4.*e1*e2*(-(A*mu*chi_pr/e2/r2)*(R1p_pr+R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
-	    djU = 4.*e1*e2*(-(A*mu*chi_pr/e2/r2)*(R1p_pr-R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
-	    dcU = 4.*e1*e2*((A*mu*chi_pr*chi_pr/2/e2/r2)*(R2p_pr+R2n_pr)-(aij*aij*aij*chi*chi*B/4/r2)*(R1p-R1n)+A*eta*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
-	    	    
+	    drU = 4.*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr/e2/r4)*(R2p_pr+R2n_pr)-(aij*aij*chi*B/2./r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
+	    diU = 4.*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr+R1n_pr)-(aij*aij*aij*chi*B/2./r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
+        djU = 4.*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr-R1n_pr)-(aij*aij*aij*chi*B/2./r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
+        dcU = 4.*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr*chi_pr/2./e2/r2)*(R1p_pr*R1p_pr+R1n_pr*R1n_pr)-(aij*aij*aij*chi*chi*B/4./r2)*(R1p*R1p-R1n*R1p)+A*eta*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
+    
 	    fx_ij= drU*dx/r+diU*cos(theta[i])+djU*cos(theta[list[i][j]]);
 	    fy_ij= drU*dy/r+diU*sin(theta[i])+djU*sin(theta[list[i][j]]);
 	    
@@ -363,13 +361,15 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    
 	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
 	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(-cos(theta[i])*sin(theta[list[i][j]])+sin(theta[i])*cos(theta[list[i][j]]));
-	    U1=4*e1*e2*A;
+	    U1=4.*e1*e2*A;
 	  }
         }
     }
  
  return 0; 
 }
+
+
 
 int eq_motion(double* x, double* y,double* theta, double* vx, double* vy, double *omega, double dt, double* kx, double* ky, double*kth, int Np, double* avK, double Th) {
   double zeta;
