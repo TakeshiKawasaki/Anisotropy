@@ -425,12 +425,11 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    
 	    
 	    //start derivation
-	    
-	    drU = 4.*e1*e2*((A*mu*chi_pr/e2/r4)*(R2p_pr+R2n_pr)-(aij*aij*chi*B/2/r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
-	    diU = 4.*e1*e2*(-(A*mu*chi_pr/e2/r2)*(R1p_pr+R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
-	    djU = 4.*e1*e2*(-(A*mu*chi_pr/e2/r2)*(R1p_pr-R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
-	    dcU = 4.*e1*e2*((A*mu*chi_pr*chi_pr/2/e2/r2)*(R2p_pr+R2n_pr)-(aij*aij*aij*chi*chi*B/4/r2)*(R1p-R1n)+A*eta*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
-	    	    
+	    drU = 4*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr/e2/r4)*(R2p_pr+R2n_pr)-(aij*aij*chi*B/2/r4)*(R2p+R2n)-B/r);//analytical calculation of the 1'st derivative / r
+	    diU = 4*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr+R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
+            djU = 4*pow(e1,eta)*pow(e2,mu)*(-(A*mu*chi_pr/e2/r2)*(R1p_pr-R1n_pr)-(aij*aij*aij*chi*B/2/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
+            dcU = 4*pow(e1,eta)*pow(e2,mu)*((A*mu*chi_pr*chi_pr/2/e2/r2)*(R2p_pr+R2n_pr)-(aij*aij*aij*chi*chi*B/4/r2)*(R1p-R1n)+A*eta*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
+    
 	    fx_ij= drU*dx/r+diU*cos(theta[i])+djU*cos(theta[list[i][j]]);
 	    fy_ij= drU*dy/r+diU*sin(theta[i])+djU*sin(theta[list[i][j]]);
 	    
@@ -485,15 +484,18 @@ int main(int argc, char *argv[])
   double time_stable_1 = 100.;
   double time_stable_2 = 1000.;
   double Th;
-  double chi = 0.5; // atof(argv[1]);  // 0.8
-  double chi_pr = 0.5; // its not finalised, not sure if its right value 
-  double eta = 1.;
-  double mu = 2.;
+  double kappa=3; // shape anisotropy parameter
+  double kappa_pr=3; // energy anisotropy parameter
+  double chi = (kappa*kappa-1)/(kappa*kappa+1); //atof(argv[1]);  
+  double chi_LJ = 10;  // 0.8
+  double eta = 1;
+  double mu = 2;
+  double chi_pr = (pow(kappa_pr*kappa_pr,1/mu)-1)/(pow(kappa_pr*kappa_pr,1/mu)+1) ; 
   double timer;
   double chi0=0.2;
 
   double RCHK=9.0;
-  double L = sqrt(double(Np)*pi*(r1*r1+r2*r2)/8.*pow(2.,0.333333)*pow((1.+2.*chi),1./6.) / 0.35); 
+   double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.95);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
