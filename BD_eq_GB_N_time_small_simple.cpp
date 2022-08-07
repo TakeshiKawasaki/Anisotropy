@@ -181,7 +181,7 @@ void ini_coord_square(double *x,double *y,double *theta,double *a,double L,int N
       x[i+num_x*j] = i*L/(double)num_x;
       y[i+num_x*j] = j*L/(double)num_y;
       theta[i+num_x*j]=M_PI/4.0;
-      a[i+num_x*j]=1.0;
+      a[i+num_x*j]=0.0;
       k++;
       if(k>=Np)
         break;
@@ -275,7 +275,86 @@ void update(double L,int Np,double *x,double *y,int M,double RCHK,int (*list)[Pm
   delete []map;
 }
 
+// should i change the value of potential in hs, but not sure which potential i should use//
+int calc_force_hs(double* x, double* y, double L, int Np, double* a, double* kx, double* ky, double *kth,int (*list)[Pm],double *theta,double chi) {
+  int i, j, k;
+  double r,r2,r4;
+  double t, drU,U,Ai,Aj,A,sin_ij,cos_ij;
+  double dx, dy;
+  double aij;
+  double cut;
+  for (k = 0; k < Np; k++) {
+    kx[k] = 0.0;
+    ky[k] = 0.0;
+    kth[k] = 0.0;
+  }
+  for (i = 0; i < Np; i++){
+    for (j = 1; j <=list[i][0]; j++){
+      dx = x[list[i][j]] - x[i];
+      dy = y[list[i][j]] - y[i];
+      if (dx > (0.5 * L))
+	dx -= L;
+      if (dx < -(0.5 * L))
+	dx += L; 
+      if (dy > (0.5 * L))
+	dy -= L;
+      if (dy < -(0.5 * L))
+	dy += L;
+      aij = (a[i] + a[list[i][j]]) / 2.0;
+      r2 = dx * dx + dy * dy;
+      r4=r2*r2;
+ 
+      Ai=cos(theta[i])*dx+sin(theta[i])*dy;
+      Aj=cos(theta[list[i][j]])*dx+sin(theta[list[i][j]])*dy;
+      A= 1+chi*(Ai*Ai+Aj*Aj)/r2;
+      cut = A*aij;
+      if (r2 < cut*cut) {
+	r=sqrt(r2);
+	t = r / aij;
 
+	drU = -(1 - t/A) /aij/A; //analytical calculation of the 1'st derivative
+	U = 0.5*(1-t/A)*(1-t/A);
+
+	cos_ij=cos(theta[i])+cos(theta[list[i][j]]);
+	sin_ij=sin(theta[i])+sin(theta[list[i][j]]);   
+	 
+      }
+      else {
+	drU = 0.0;
+	continue;
+      } 
+       
+      kx[list[i][j]] -= drU * dx / r;
+      kx[i] += drU * dx / r;
+      ky[list[i][j]] -= drU * dy / r;
+      ky[i] += drU * dy / r;
+       
+
+
+      kx[i]          += -drU*r/A*(
+				  + 2.*chi*Ai*(cos(theta[i])*dy*dy-sin(theta[i])*dx*dy)/r4
+				  +2.*chi*Aj*(cos(theta[list[i][j]])*dy*dy-sin(theta[list[i][j]])*dx*dy)/r4);
+       
+      kx[list[i][j]] -= -drU*r/A*(
+				  +2.*chi*Ai*(cos(theta[i])*dy*dy-sin(theta[i])*dx*dy)/r4
+				  +2.*chi*Aj*(cos(theta[list[i][j]])*dy*dy-sin(theta[list[i][j]])*dx*dy)/r4);
+       
+      ky[i]          += -drU*r/A*(
+				  +2.*chi*Ai*(-cos(theta[i])*dx*dy+sin(theta[i])*dx*dx)/r4
+				  + 2.*chi*Aj*(-cos(theta[list[i][j]])*dx*dy+sin(theta[list[i][j]])*dx*dx)/r4);
+       
+      ky[list[i][j]]  -= -drU*r/A*( 
+				   +2.*chi*Ai*(-cos(theta[i])*dx*dy+sin(theta[i])*dx*dx)/r4
+				   + 2.*chi*Aj*(-cos(theta[list[i][j]])*dx*dy+sin(theta[list[i][j]])*dx*dx)/r4);
+       
+       
+      kth[i]         -= -t/A*drU*chi*(sin(2.*theta[i])*(-dx*dx+dy*dy)+2.*cos(2.*theta[i])*dx*dy)/r2;
+      kth[list[i][j]]-= -t/A*drU*chi*(sin(2.*theta[list[i][j]])*(-dx*dx+dy*dy)+2.*cos(2.*theta[list[i][j]])*dx*dy)/r2;
+       
+    }
+  }
+  return 0;
+}
 
 int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, double* ky,double *kth,int (*list)[Pm],double *theta,double chi,double chi_pr,double mu,double eta) {
   int i, j, k;
