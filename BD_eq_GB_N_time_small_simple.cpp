@@ -181,7 +181,7 @@ void ini_coord_square(double *x,double *y,double *theta,double *a,double L,int N
       x[i+num_x*j] = i*L/(double)num_x;
       y[i+num_x*j] = j*L/(double)num_y;
       theta[i+num_x*j]=M_PI/4.0;
-      a[i+num_x*j]=0.0;
+      a[i+num_x*j]=1.0;
       k++;
       if(k>=Np)
         break;
