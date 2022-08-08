@@ -353,11 +353,11 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    fx_ij= drU*dx/r+diU*cos(theta[i])+djU*cos(theta[list[i][j]]);
 	    fy_ij= drU*dy/r+diU*sin(theta[i])+djU*sin(theta[list[i][j]]);
 	    
-	    kx[i]+=fx_ij;
-	    kx[list[i][j]]-=fx_ij;
+	    kx[i]-=fx_ij;
+	    kx[list[i][j]]+=fx_ij;
 	    
-	    ky[i]+=fy_ij;	    
-	    ky[list[i][j]]-=fy_ij;
+	    ky[i]-=fy_ij;	    
+	    ky[list[i][j]]+=fy_ij;
 	    
 	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
 	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
