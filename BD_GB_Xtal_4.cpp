@@ -426,7 +426,7 @@ int main(int argc, char *argv[])
   double disp_max=0.0;
   double disp_ave=0.0;
   int Np = 1000;int count_th=200;
-  double r1=1.0, r2=1.0;
+ 
   double disp_th =10.0;
   double dt =0.0005;//  //parameters;
   double time_stable_1 = 100.;
@@ -440,13 +440,15 @@ int main(int argc, char *argv[])
  
   double eta = 1.0;
   double mu = 2.0;
+  double phi=0.95;
+  double temp=0.3;
   double chi_pr = (pow(kappa_pr,1./mu)-1.)/(pow(kappa_pr,1./mu)+1.) ; 
 
   double timer;
   double chi0=0.2;
 
   double RCHK=9.0;
-  double L = (r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/0.);
+  double L = 1./2.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
@@ -489,7 +491,7 @@ int main(int argc, char *argv[])
   copy(x_update,y_update,x,y,Np,x_corr,y_corr);
   copy(x0,y0,x,y,Np,x_corr,y_corr);
   
-  Th=0.001;
+  Th=temp;
   for(;;){ // infinite loop
     calc_force(x, y, L, Np, a, kx, ky,kth,list,theta,chi,chi_pr,mu,eta);
     eq_motion(x, y, theta, vx, vy, omega, dt, kx, ky,kth, Np, &avK0,Th);
