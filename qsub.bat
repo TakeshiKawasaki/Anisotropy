@@ -1,15 +1,12 @@
-#!/bin/bash
-#
-#$ -cwd
-#$ -j y
-#$ -S /bin/bash
-#$ -m ea
-#$ -V
-#
-#$ -q all.q@banana
-#$ -q all.q@nashi
-#$ -q all.q@kuri
-#$ -q all.q@lemon
-#$ -q all.q@mango
+#!/bin/bash                                                                                                                   
+#                                                                                                                             
+#$ -cwd                                                                                                                       
+#$ -j y                                                                                                                       
+#$ -S /bin/bash                                                                                                               
+#$ -M kawasaki@r.phys.nagoya-u.ac.jp                                                                                          
+#$ -m ea                                                                                                                      
+#$ -V                                                                                                                         
+#                                                                                                                             
+#$ -q all.q@banana                                                                                                            
 
 ./a.out
