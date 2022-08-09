@@ -171,6 +171,27 @@ double gaussian_rand(void)
   }
 }
 
+void ini_hex(double *x,double *y,double *theta,double *a,double L,int Np){
+  int num_x = (int)sqrt(Np)+1;
+  int num_y = (int)sqrt(Np)+1;
+  int i,j,k=0;
+  double shift;
+  for(j=0;j<num_y;j++){
+    for(i=0;i<num_x;i++){
+      shift=(double)j*0.5-j/2;
+      x[i+num_x*j] = (shift+i)*L/(double)num_x;
+      y[i+num_x*j] = j*L/(double)num_y;
+      theta[i+num_x*j]=M_PI/4.0;
+      a[i+num_x*j]=1.0;
+      k++;
+      if(k>=Np)
+        break;
+    }
+    if(k>=Np)
+      break;
+  }
+}
+
 
 void ini_coord_square(double *x,double *y,double *theta,double *a,double L,int Np){
   int num_x = (int)sqrt(Np)+1;
@@ -425,7 +446,7 @@ int main(int argc, char *argv[])
   double chi0=0.2;
 
   double RCHK=9.0;
-  double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.1);
+  double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.7);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
@@ -449,7 +470,28 @@ int main(int argc, char *argv[])
 
   char filename[128];
   
-  ini_coord_square(x,y,theta,a,L,Np);
+  //ini_coord_square(x,y,theta,a,L,Np);
+  ini_hex(x,y,theta,a,L,Np);
+  int num_x = (int)sqrt(Np)+1;
+  int num_y = (int)sqrt(Np)+1;
+  int i,j,k=0;
+  double shift;
+  for(j=0;j<num_y;j++){
+    for(i=0;i<num_x;i++){
+      shift=(double)j*0.5-j/2;
+      x[i+num_x*j] = (shift+i)*L/(double)num_x;
+      y[i+num_x*j] = j*L/(double)num_y;
+      theta[i+num_x*j]=M_PI/4.0;
+      a[i+num_x*j]=1.0;
+      k++;
+      if(k>=Np)
+        break;
+    }
+    if(k>=Np)
+      break;
+  }
+}
+
   ini(vx, vy, Np,omega);  
   
   sprintf(filename,"%s/energy_time.txt",argv[1]);
