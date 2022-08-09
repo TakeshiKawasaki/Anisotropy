@@ -413,8 +413,8 @@ int main(int argc, char *argv[])
   double Th;
 
 
-  double kappa=2.; // shape anisotropy parameter
-  double kappa_pr=2.; // energy anisotropy parameter
+  double kappa=3.; // shape anisotropy parameter
+  double kappa_pr=3.; // energy anisotropy parameter
   double chi = (kappa*kappa-1.)/(kappa*kappa+1.); //atof(argv[1]);  
  
   double eta = 1.0;
@@ -425,7 +425,7 @@ int main(int argc, char *argv[])
   double chi0=0.2;
 
   double RCHK=9.0;
-  double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.05);
+  double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.1);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
