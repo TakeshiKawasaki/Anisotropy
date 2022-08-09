@@ -335,7 +335,7 @@ int calc_force(double* x, double* y, double L, int Np, double* a, double* kx, do
 	    A12 = A6*A6;
 	    
 	    A = A12-A6;
-	    B = 13.*A12*A1-7.*A6*A1;
+	    B = 12.*A12*A1-6.*A6*A1;
 	    
 	    
 	    //	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
