@@ -7,4 +7,7 @@ This work is licensed under a
 [cc-by-sa-image]: https://licensebuttons.net/l/by-sa/4.0/88x31.png
 [cc-by-sa-shield]: https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg
 
-異方粒子系
+## Obtaining the codes via Git (available in our clusters) <br>
+ `git clone https://github.com/TakeshiKawasaki/Anisotropy` repo <br>
+ For update:<br>
+ `git pull` 
