@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
  
   double eta = 1.0;
   double mu = 2.0;
-  double chi_pr = (pow(kappa_pr*kappa_pr,1./mu)-1.)/(pow(kappa_pr*kappa_pr,1./mu)+1.) ; 
+  double chi_pr = (pow(kappa_pr,1./mu)-1.)/(pow(kappa_pr,1./mu)+1.) ; 
 
   double timer;
   double chi0=0.2;
