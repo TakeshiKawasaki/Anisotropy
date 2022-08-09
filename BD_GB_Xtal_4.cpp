@@ -446,7 +446,7 @@ int main(int argc, char *argv[])
   double chi0=0.2;
 
   double RCHK=9.0;
-  double L = (r1+r2)/4.0*sqrt(pi*kappa*Np/0.7);
+  double L = (r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/0.);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
