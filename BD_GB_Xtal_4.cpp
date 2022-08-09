@@ -472,25 +472,6 @@ int main(int argc, char *argv[])
   
   //ini_coord_square(x,y,theta,a,L,Np);
   ini_hex(x,y,theta,a,L,Np);
-  int num_x = (int)sqrt(Np)+1;
-  int num_y = (int)sqrt(Np)+1;
-  int i,j,k=0;
-  double shift;
-  for(j=0;j<num_y;j++){
-    for(i=0;i<num_x;i++){
-      shift=(double)j*0.5-j/2;
-      x[i+num_x*j] = (shift+i)*L/(double)num_x;
-      y[i+num_x*j] = j*L/(double)num_y;
-      theta[i+num_x*j]=M_PI/4.0;
-      a[i+num_x*j]=1.0;
-      k++;
-      if(k>=Np)
-        break;
-    }
-    if(k>=Np)
-      break;
-  }
-}
 
   ini(vx, vy, Np,omega);  
   
