@@ -12,4 +12,5 @@ This work is licensed under a
  `git pull` 
  
 ## Model <br>
-m$\mathbr{r}$
+EoM
+$$ m\mathbr{r} $$
