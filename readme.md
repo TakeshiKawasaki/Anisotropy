@@ -1,4 +1,3 @@
-
 This work is licensed under a
 [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].<br>
 [![CC BY-SA 4.0][cc-by-sa-image]][cc-by-sa]
@@ -11,3 +10,6 @@ This work is licensed under a
  `git clone https://github.com/TakeshiKawasaki/Anisotropy` repo <br>
  For update:<br>
  `git pull` 
+ 
+## Model <br>
+m$\mathbr{r}$
