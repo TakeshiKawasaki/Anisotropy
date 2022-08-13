@@ -202,13 +202,12 @@ double gaussian_rand(void)
   }
 }
 
-
 void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, double* theta1, double* theta2, double *a,double L,int Np){
   int num_x = (int)(pow(Np/4.,1./3.))+1;
   int num_y = (int)(pow(Np/4.,1./3.))+1;
   int num_z = (int)(pow(Np/4.,1./3.))+1;
-  double c[Np];
-  for(int j =0 ; j<Np; j++){
+  double c[3*Np+3];
+  for(int j =0 ; j< 3*Np +3; j++){
     c[j] = 0.; 
   }
   
@@ -230,7 +229,7 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         cout <<  "p = " << "  " << p << " " << ", x = " << "  " << c[p]<< " " << ", y = " << "  " << c[p+1] << " " << ", z = " << "  " << c[p+2] << endl;
         p += 3;
      
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;
 
         c[p] = i*lx;
@@ -239,7 +238,7 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         cout <<  "p = " << "  " << p << " " << ", x = " << "  " << c[p]<< " " << ", y = " << "  " << c[p+1] << " " << ", z = " << "  " << c[p+2] << endl;
         p += 3;
    
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;
 
         c[p] = i*lx + lz/sqrt(2.);
@@ -247,7 +246,7 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         c[p+2] = k*lz + lz/sqrt(2.);
         cout <<  "p = " << "  " << p << " " << ", x = " << "  " << c[p]<< " " << ", y = " << "  " << c[p+1] << " " << ", z = " << "  " << c[p+2] << endl;
         p += 3;
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;
 
         c[p] = i*lx + lz/sqrt(2.);
@@ -255,14 +254,14 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         c[p+2] = k*lz;
         cout <<  "p = " << "  " << p << " " << ", x = " << "  " << c[p]<< " " << ", y = " << "  " << c[p+1] << " " << ", z = " << "  " << c[p+2] << endl;
         p += 3;
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;
        }
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;       
         
       }
-        if(p>=Np)
+        if(p >=3*Np+3)
         break;
     }
 
@@ -278,6 +277,7 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         theta2[p] = 1./sqrt(2.);
     }
   }
+
 
 
 
