@@ -557,14 +557,13 @@ int main(int argc, char *argv[])
   double disp_max=0.0;
   double disp_ave=0.0;
   int Np = 1000;int count_th=200;
-  double r1=1.0, r2=1.0;
+ 
   double disp_th =5.5;
   double dt =0.0005;//  //parameters;
-  double time_stable_1 = 100.;
-  double time_stable_2 = 1000.;
-  double Th;
-  double phi = 0.5;
 
+  double Th;
+  double temp =0.01; // temperature
+  double phi = 0.1;
 
   double kappa = 3.; // shape anisotropy parameter
   double kappa_pr = 3.; // energy anisotropy parameter
@@ -575,10 +574,9 @@ int main(int argc, char *argv[])
   double chi_pr = (pow(kappa_pr,1./mu)-1.)/(pow(kappa_pr,1./mu)+1.) ; 
 
   double timer;
-  double chi0=0.2;
 
   double RCHK=9.0;
-  double L = pow((pi*pow(2.,1./3.)*kappa)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
+  double L = pow((pi*pow(2.,1./3.)*kappa*Np)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
@@ -593,6 +591,7 @@ int main(int argc, char *argv[])
   z0 = new double[Np];
   x_update = new double[Np];
   y_update = new double[Np];
+  z_update = new double[Np];
   vx = new double[Np];
   vy = new double[Np];
   vz = new double[Np];
@@ -637,10 +636,9 @@ int main(int argc, char *argv[])
   copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
   copy(x0,y0,z0,x,y,z,Np,x_corr,y_corr,z_corr);
 
-  Th=0.6;
   for(;;){ // infinite loop
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta);
-    eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,Th);
+    eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
     timer += dt;
