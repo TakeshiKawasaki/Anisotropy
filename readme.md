@@ -15,6 +15,7 @@ This work is licensed under a
 $$
 x_1
 $$
+
 $$
 \begin{aligned}
 &\sigma(\hat{\mathbf{u}}_1, \hat{\mathbf{u}}_2, \hat{\mathbf{r}}) \\
