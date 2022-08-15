@@ -527,7 +527,7 @@ for (k = 0; k < Np; k++) {
     n_pr2[k] = nx_pr[k]*nx_pr[k] + ny_pr[k]*ny_pr[k] + nz_pr[k]*nz_pr[k];
     nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nx_pr[k]*dt + knx[k]*dt + Ry[k]*nz[k] - Rz[k]*ny[k] ;
     ny_pr[k] += -n_pr2[k]*ny[k]*dt - zeta_r*ny_pr[k]*dt + kny[k]*dt + Rz[k]*nx[k] - Rx[k]*nz[k] ;
-    nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nz_pr[k]*dt + knz[k]*dt + Rx[k]*ny[k] - Ry[k]*nx[k] ;
+    nz_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nz_pr[k]*dt + knz[k]*dt + Rx[k]*ny[k] - Ry[k]*nx[k] ;
   
     x[k] += vx[k] * dt;
     y[k] += vy[k] * dt;
