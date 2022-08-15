@@ -155,20 +155,20 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_%.d_0.3_0.9.dat",count_file);
+  sprintf(filename,"coord_%.d_0.1_0.1_cut3.0.dat",count_file);
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
     x1[i]=x[i]-x_corr;
     y1[i]=y[i]-y_corr;
     z1[i]=z[i]-z_corr;
-    theta1[i] = acos(nz[i]);
-    theta2[i] = acos(nx[i]/(sin(theta1[i])+0.000000001));
+    //theta1[i] = acos(nz[i]);
+    //theta2[i] = atan(ny[i]/(nx[i]+0.000000001));
 
   }
   p_bound(x1, y1, z1, Np, L);  
   for(i=0;i<Np;i++)
-    file << x1[i] << " " << y1[i] << " " << z1[i]<< " "<<theta1[i]<<" " <<theta2[i]<<" " << r1[i] << endl; 
+    file << x1[i] << " " << y1[i] << " " << z1[i]<< " "<<nx[i]<<" " <<ny[i]<<" " << nz[i] << endl; 
   file.close(); 
  
   count_file++;
@@ -274,8 +274,8 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         ny[p] = 1./2.;
         nz[p] = 1./sqrt(2.);
         a[p] = 1.;
-        theta1[p] = 1./sqrt(2.);
-        theta2[p] = 1./sqrt(2.);
+       // theta1[p] = 1./sqrt(2.);
+       // theta2[p] = 1./sqrt(2.);
     }
   }
 
@@ -420,11 +420,11 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
           r2 = dx*dx + dy*dy + dz*dz;
           r3 = r2*r;
           r4 = r2*r2;
-	  if(r2< 7.0*7.0){  // the force by potential energy would work if the distance is smaller than 3*(charcteristic length) maybe i better put it just after calculating r??
+	  if(r2< 3.0*3.0){  // the force by potential energy would work if the distance is smaller than 3*(charcteristic length) maybe i better put it just after calculating r??
 	    
-	    ri = dx*nx[i]+dy*ny[i]+dz*nz[i];
-	    rj = dx*nx[list[i][j]]+dy*ny[list[i][j]]+dz*nz[list[i][j]];
-	    cij = nx[i]*nx[list[i][j]]+ny[i]*ny[list[i][j]]+nz[i]*nz[list[i][j]];
+	    ri = dx*nx[i] + dy*ny[i] + dz*nz[i];
+	    rj = dx*nx[list[i][j]] + dy*ny[list[i][j]] + dz*nz[list[i][j]];
+	    cij = nx[i]*nx[list[i][j]] + ny[i]*ny[list[i][j]] + nz[i]*nz[list[i][j]];
 	    
 	    
 	    R2p =(ri+rj)*(ri+rj)/(1+chi*cij);
@@ -438,7 +438,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
  	    R1n_pr =(ri-rj)/(1-chi_pr*cij);    
 	    	    
 	    aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
-      aij_pr3 = aij_pr*aij_pr*aij_pr;
+        aij_pr3 = aij_pr*aij_pr*aij_pr;
 	    
 	    A1 = (aij/(r-aij_pr+aij));
 	    A2 =A1*A1;
@@ -463,31 +463,31 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
     
 	    fx_ij = drU*dx/r+diU*nx[i]+djU*nx[list[i][j]];  //du/dr
 	    fy_ij = drU*dy/r+diU*ny[i]+djU*ny[list[i][j]];
-      fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]];
+        fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]];
 	    
-	    kx[i]-=fx_ij;
-	    kx[list[i][j]]+=fx_ij;
+	    kx[i] -= fx_ij;
+	    kx[list[i][j]] += fx_ij;
 	    
-	    ky[i]-=fy_ij;	    
-	    ky[list[i][j]]+=fy_ij;
+	    ky[i] -= fy_ij;	    
+	    ky[list[i][j]] += fy_ij;
 
-        kz[i]-=fz_ij;
-	    kz[list[i][j]]+=fz_ij;
+        kz[i] -= fz_ij;
+	    kz[list[i][j]] += fz_ij;
 
 // -du/dn 
-        knx[i] -= diU*dx + dcU*nx[list[i][j]];
-        knx[list[i][j]] -= djU*dx + dcU*nx[i];
+        knx[i] -= diU * (nz[i]*nz[i]*dx - nx[i]*nz[i]*dz - nx[i]*ny[i]*dy + ny[i]*ny[i]*dx) + dcU*(nz[i]*nz[i]*nx[list[i][j]] - nx[i]*nz[i]*nz[list[i][j]] - nx[i]*ny[i]*ny[list[i][j]] + ny[i]*ny[i]*nx[list[i][j]]);
+        knx[list[i][j]] -= diU * (nz[list[i][j]]*nz[list[i][j]]*dx - nx[list[i][j]]*nz[list[i][j]]*dz - nx[list[i][j]]*ny[list[i][j]]*dy + ny[list[i][j]]*ny[list[i][j]]*dx) + dcU*(nx[i]*nz[list[i][j]]*nz[list[i][j]] - nz[i]*nx[list[i][j]]*nz[list[i][j]] - ny[i]*nx[list[i][j]]*ny[list[i][j]] + nx[i]*ny[list[i][j]]*ny[list[i][j]]);
 
-        kny[i] -= diU*dy + dcU*ny[list[i][j]];
-        kny[list[i][j]] -= djU*dy + dcU*ny[i];
+        kny[i] -= diU * (nx[i]*nx[i]*dy - nx[i]*ny[i]*dx - ny[i]*nz[i]*dz + nz[i]*nz[i]*dy) + dcU*(nx[i]*nx[i]*ny[list[i][j]] - nx[i]*ny[i]*nx[list[i][j]] - ny[i]*nz[i]*nz[list[i][j]] + nz[i]*nz[i]*ny[list[i][j]]);
+        kny[list[i][j]] -= diU * (nx[list[i][j]]*nx[list[i][j]]*dy - nx[list[i][j]]*ny[list[i][j]]*dx - ny[list[i][j]]*nz[list[i][j]]*dz + nz[list[i][j]]*nz[list[i][j]]*dy) + dcU*(ny[i]*nx[list[i][j]]*nx[list[i][j]] - nx[i]*nx[list[i][j]]*ny[list[i][j]] - nz[i]*ny[list[i][j]]*nz[list[i][j]] + ny[i]*nz[list[i][j]]*nz[list[i][j]]);
 
-        knz[i] -= diU*dz + dcU*nz[list[i][j]];
-        knz[list[i][j]] -= djU*dz + dcU*nz[i];
+        knz[i] -= diU * (ny[i]*ny[i]*dz - ny[i]*nz[i]*dy - nx[i]*nz[i]*dx + nx[i]*nx[i]*dz) + dcU*(ny[i]*ny[i]*nz[list[i][j]] - ny[i]*nz[i]*ny[list[i][j]] - nx[i]*nz[i]*nx[list[i][j]] + nx[i]*nx[i]*nz[list[i][j]]);
+        knz[list[i][j]] -= diU * (ny[list[i][j]]*ny[list[i][j]]*dz - ny[list[i][j]]*nz[list[i][j]]*dy - nx[list[i][j]]*nz[list[i][j]]*dx + nx[list[i][j]]*nx[list[i][j]]*dz) + dcU*(nz[i]*ny[list[i][j]]*ny[list[i][j]] - ny[i]*ny[list[i][j]]*nz[list[i][j]] - nx[i]*nx[list[i][j]]*nz[list[i][j]] + nz[i]*nx[list[i][j]]*nx[list[i][j]]);;
 
 	    
 //	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
 //	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
-	    U1=4.*e1*e2*A;
+	    U1=4.*pow(e1,eta)*pow(e2,mu)*A;
 	  }
         }
     }
@@ -500,6 +500,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 int eq_motion(double* x, double* y,double* z,double* theta1,double* theta2, double* vx, double* vy, double* vz,double* nx,double* ny,double* nz, double* nx_pr,double* ny_pr,double* nz_pr, double* omega, double dt, double* kx, double* ky, double* kz,double* knx,double* kny,double* knz, int Np, double* avK, double Th) {
   double zeta, zeta_r;
   double n[Np];
+  double n_pr2[Np];
   double Rx[Np];
   double Ry[Np];
   double Rz[Np];
@@ -507,6 +508,7 @@ int eq_motion(double* x, double* y,double* z,double* theta1,double* theta2, doub
   int k;
 for (k = 0; k < Np; k++) {
     n[k] = 0.0;
+    n_pr2[k] = 0.0;
     Rx[k] = 0.0;
     Ry[k] = 0.0;
     Rz[k] = 0.0;
@@ -522,9 +524,10 @@ for (k = 0; k < Np; k++) {
     Rx[k] = sqrt(2. * zeta_r * Th * dt) * gaussian_rand();
     Ry[k] = sqrt(2. * zeta_r * Th * dt) * gaussian_rand();
     Rz[k] = sqrt(2. * zeta_r * Th * dt) * gaussian_rand();
-    nx_pr[k] += -nx_pr[k] * zeta_r * dt + knx[k] * dt + ny[k] * Rz[k] - nz[k] * Ry[k] ;
-    ny_pr[k] += -ny_pr[k] * zeta_r * dt + kny[k] * dt + nz[k] * Rx[k] - nx[k] * Rz[k] ;
-    nz_pr[k] += -nz_pr[k] * zeta_r * dt + knz[k] * dt + nx[k] * Ry[k] - ny[k] * Rx[k] ;   
+    n_pr2[k] = nx_pr[k]*nx_pr[k] + ny_pr[k]*ny_pr[k] + nz_pr[k]*nz_pr[k];
+    nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nx_pr[k]*dt + knx[k]*dt + Ry[k]*nz[k] - Rz[k]*ny[k] ;
+    ny_pr[k] += -n_pr2[k]*ny[k]*dt - zeta_r*ny_pr[k]*dt + kny[k]*dt + Rz[k]*nx[k] - Rx[k]*nz[k] ;
+    nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nz_pr[k]*dt + knz[k]*dt + Rx[k]*ny[k] - Ry[k]*nx[k] ;
   
     x[k] += vx[k] * dt;
     y[k] += vy[k] * dt;
@@ -540,10 +543,13 @@ for (k = 0; k < Np; k++) {
     ny[k] = ny[k] / n[k];
     nz[k] = nz[k] / n[k];
 
+//    theta1[k] = acos(nz[k]);
+ //   theta2[k] = acos(nx[k]/(sin(theta1[k])+0.000000001));
+
    
     *avK += vx[k] * vx[k] + vy[k] * vy[k] + vz[k] * vz[k] + (nx_pr[k] * nx_pr[k] + ny_pr[k] * ny_pr[k] + nz_pr[k] * nz_pr[k] )/(nx[k] * nx[k] + ny[k] * ny[k] + nz[k] * nz[k]);
   }
-  *avK = *avK / Np / 2.0/1.5;
+  *avK = *avK / Np / 2.0/ 2.5;
   return 0;
 }
 
@@ -557,13 +563,12 @@ int main(int argc, char *argv[])
   double disp_max=0.0;
   double disp_ave=0.0;
   int Np = 1000;int count_th=200;
- 
-  double disp_th =5.5;
+  double disp_th = 10.;
   double dt =0.0005;//  //parameters;
-
+  double temp = 0.1;
   double Th;
-  double temp =0.01; // temperature
   double phi = 0.1;
+
 
   double kappa = 3.; // shape anisotropy parameter
   double kappa_pr = 3.; // energy anisotropy parameter
@@ -618,7 +623,7 @@ int main(int argc, char *argv[])
   //ini_hex(x,y,theta,a,L,Np);
   ini_fcc(x,y,z,nx,ny,nz,theta1,theta2,a,L,Np);
 
-  ini(vx, vy, vz, nx, ny, nz, Np,omega);  
+  ini(vx, vy, vz, nx_pr, ny_pr, nz_pr, Np,omega);  
 
   
   sprintf(filename,"%s/energy_time.txt",argv[1]);
@@ -636,15 +641,16 @@ int main(int argc, char *argv[])
   copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
   copy(x0,y0,z0,x,y,z,Np,x_corr,y_corr,z_corr);
 
+
   for(;;){ // infinite loop
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta);
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
     timer += dt;
-     cout <<"disp"<< disp_ave <<"x="<<x[1]<<" "<<avK0<< endl;      
+     cout <<"disp"<< disp_ave << "x=" << x[1] <<" "<<avK0<< endl;   //" ""theta1= " << theta1[1] <<" ""theta2= " << theta2[1] <<" "<<avK0<< endl;      
     if(disp_ave>disp_th*disp_th){ // the condition for changing temp
-      output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,a,Np); // does it mean every output has different temp??
+      output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,a,Np); 
 	break;
     }
     
