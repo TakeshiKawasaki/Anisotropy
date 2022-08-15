@@ -588,8 +588,8 @@ int main(int argc, char *argv[])
 
   double timer;
 
-  double RCHK=9.0;
-  double L = pow((pi*pow(2.,1./3.)*kappa*Np)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
+  double RCHK=4.0;
+  double L = pow((pi*pow(2.,1./2.)*kappa*Np)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
   int    M=(int)(L/RCHK);
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
