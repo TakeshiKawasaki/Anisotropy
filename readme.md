@@ -12,3 +12,9 @@ This work is licensed under a
  `git pull` 
  
 ## Model <br>
+$$
+\begin{aligned}
+&\sigma\left(\hat{\mathbf{u}}_{1}, \hat{\mathbf{u}}_{2}, \hat{\mathbf{r}}\right) \\
+&\quad=\sigma_{0}\left(1-\frac{1}{2} \chi\left\{\frac{\left(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}+\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2}\right)^{2}}{1+\chi\left(\mathbf{u}_{1} \cdot u_{2}\right)}+\frac{\left(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}-\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2}\right)^{2}}{1-\chi\left(\mathbf{u}_{1} \cdot \hat{\mathbf{u}}_{2}\right)}\right\}\right)^{-1 / 2}
+\end{aligned}
+$$
