@@ -15,6 +15,6 @@ This work is licensed under a
 $$
 \begin{aligned}
 &\sigma(\hat{\mathbf{u}}_{1}, \hat{\mathbf{u}}_{2}, \hat{\mathbf{r}}) \\
-&\quad=\sigma_{0}(1-\frac{1}{2} \chi\{\frac{(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}+\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2}\right)^{2}}{1+\chi\left(\mathbf{u}_{1} \cdot u_{2}\right)}+\frac{\left(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}-\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2})^{2}}{1-\chi\left(\mathbf{u}_{1} \cdot \hat{\mathbf{u}}_{2}\right)}\})^{-1 / 2}
+&\quad=\sigma_{0}(1-\frac{1}{2} \chi\{\frac{(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}+\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2}\right)^{2}}{1+\chi(\mathbf{u}_{1} \cdot u_{2})}+\frac{(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}-\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2})^{2}}{1-\chi(\mathbf{u}_{1} \cdot \hat{\mathbf{u}}_{2})}\})^{-1 / 2}
 \end{aligned}
 $$
