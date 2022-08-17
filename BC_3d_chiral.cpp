@@ -504,7 +504,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 }
 
 
-int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, double* ny, double* nz,int Np, double* a, double* kx, double* ky,double* kz,double *knx,double *kny,double *knz,int (*list)[Pm],double *theta1,double *theta2,double chi,double chi_pr,double mu,double eta) {
+int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, double* ny, double* nz,int Np, double* a, double* kx, double* ky,double* kz,double *knx,double *kny,double *knz,int (*list)[Pm],double *theta1,double *theta2,double chi,double chi_pr,double mu,double eta,double chiral){
   int i, j, k;
   // *avU = 0.0;
   double r,r2,r3,r4,ri,rj,cij,dij;
@@ -545,7 +545,6 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
 
           aij = (a[list[i][j]] + a[i]) / 2.0;
           aij3 = aij*aij*aij;
-
 	  // cout<<theta[list[i][j]]<<endl;
           r = sqrt(dx*dx + dy*dy + dz*dz);
           r2 = dx*dx + dy*dy + dz*dz;
@@ -571,12 +570,12 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
  	    R1n_pr =(ri-rj)/(1-chi_pr*cij);
 
 	    aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
-      aij_pr3 = aij_pr*aij_pr*aij_pr;
+            aij_pr3 = aij_pr*aij_pr*aij_pr;
 
 	    A1 = (aij/(r-aij_pr+aij));
-	    A2 =A1*A1;
+	    A2 = A1*A1;
 	    A6 = A2*A2*A2;
-      A8=  A2*A2*A2*A2;
+            A8=  A2*A2*A2*A2;
 
 	    A = A6*A1/r;
 	    B = 7.*A8/r-A6*A1/r/r;
@@ -586,17 +585,16 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
 	    e1 = 1./sqrt(1-chi*chi*cij*cij);  //epsilon1
 	    e2 = 1.-(chi_pr/2./r2)*(R2p_pr+R2n_pr); // epsilon2
 
-
 	    //start derivation
 
-	    drU = 4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr)/e2/r3)*(R2p_pr+R2n_pr)-((aij_pr3*chi*B)/2./aij3/r3)*(R2p+R2n)-B/aij);//analytical calculation of the 1'st derivative / r
-	    diU = 4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr+R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
-      djU = 4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr-R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
-      dcU = 4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr*chi_pr)/2./e2/r2)*(R1p_pr*R1p_pr-R1n_pr*R1n_pr)-((aij_pr3*chi*chi*B)/4./aij3/r2)*(R1p*R1p-R1n*R1n)+A*eta*chi*chi*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
+	    drU = chiral*4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr)/e2/r3)*(R2p_pr+R2n_pr)-((aij_pr3*chi*B)/2./aij3/r3)*(R2p+R2n)-B/aij);//analytical calculation of the 1'st derivative / r
+	    diU = chiral*4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr+R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
+            djU = chiral*4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr-R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
+            dcU = chiral*4.*cij*dij*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr*chi_pr)/2./e2/r2)*(R1p_pr*R1p_pr-R1n_pr*R1n_pr)-((aij_pr3*chi*chi*B)/4./aij3/r2)*(R1p*R1p-R1n*R1n)+A*eta*chi*chi*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
 
 	    fx_ij = drU*dx/r+diU*nx[i]+djU*nx[list[i][j]]+4.*cij*pow(e1,eta)*pow(e2,mu)*A*(ny[i]*nz[list[i][j]]-nz[i]*ny[list[i][j]]);  //du/dr
 	    fy_ij = drU*dy/r+diU*ny[i]+djU*ny[list[i][j]]+4.*cij*pow(e1,eta)*pow(e2,mu)*A*(nz[i]*nx[list[i][j]]-nx[i]*nz[list[i][j]]);
-      fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]]+4.*cij*pow(e1,eta)*pow(e2,mu)*A*(nx[i]*ny[list[i][j]]-ny[i]*nx[list[i][j]]);
+            fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]]+4.*cij*pow(e1,eta)*pow(e2,mu)*A*(nx[i]*ny[list[i][j]]-ny[i]*nx[list[i][j]]);
 
 	    kx[i] -= fx_ij;
 	    kx[list[i][j]] += fx_ij;
@@ -604,7 +602,7 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
 	    ky[i] -= fy_ij;
 	    ky[list[i][j]] += fy_ij;
 
-      kz[i] -= fz_ij;
+            kz[i] -= fz_ij;
 	    kz[list[i][j]] += fz_ij;
 
 // -du/dn
@@ -617,18 +615,18 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
 //        knz[i] -= diU * (ny[i]*ny[i]*dz - ny[i]*nz[i]*dy - nx[i]*nz[i]*dx + nx[i]*nx[i]*dz) + dcU*(ny[i]*ny[i]*nz[list[i][j]] - ny[i]*nz[i]*ny[list[i][j]] - nx[i]*nz[i]*nx[list[i][j]] + nx[i]*nx[i]*nz[list[i][j]]);
 //        knz[list[i][j]] -= djU * (ny[list[i][j]]*ny[list[i][j]]*dz - ny[list[i][j]]*nz[list[i][j]]*dy - nx[list[i][j]]*nz[list[i][j]]*dx + nx[list[i][j]]*nx[list[i][j]]*dz) + dcU*(nz[i]*ny[list[i][j]]*ny[list[i][j]] - ny[i]*ny[list[i][j]]*nz[list[i][j]] - nx[i]*nx[list[i][j]]*nz[list[i][j]] + nz[i]*nx[list[i][j]]*nx[list[i][j]]);
 
-        knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]) +4.*dij*pow(e1,eta)*pow(e2,mu)*nx[i];
-        knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]) +4.*dij*pow(e1,eta)*pow(e2,mu)*nx[list[i][j]];
+        knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nx[list[i][j]]-cij*nx[i]);
+        knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nx[i]-cij*nx[list[i][j]]);
 
-        kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i])+4.*dij*pow(e1,eta)*pow(e2,mu)*ny[i];
-        kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]) +4.*dij*pow(e1,eta)*pow(e2,mu)*ny[list[i][j]];
+        kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i])+ chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(ny[list[i][j]]-cij*ny[i]);
+        kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(ny[i]-cij*ny[list[i][j]]);
 
- 	    　knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]) +4.*dij*pow(e1,eta)*pow(e2,mu)*nz[i];
-        knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]) +4.*dij*pow(e1,eta)*pow(e2,mu)*nz[list[i][j]];
+ 	knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nz[list[i][j]]-cij*nz[i]);
+        knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nz[i]-cij*nz[list[i][j]]);
 
 //	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));
 //	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
-	     U1=4.*cij*dij*pow(e1,eta)*pow(e2,mu)*A;
+	     U1=chiral*4.*cij*dij*pow(e1,eta)*pow(e2,mu)*A;
 	  }
         }
     }
@@ -710,7 +708,7 @@ int main(int argc, char *argv[])
   double Th;
   double phi = 0.1;
 
-
+  double chiral =2.0;
   double kappa = 3.; // shape anisotropy parameter
   double kappa_pr = 3.; // energy anisotropy parameter
   double chi = (kappa*kappa-1.)/(kappa*kappa+1.); //atof(argv[1]);
@@ -785,6 +783,7 @@ int main(int argc, char *argv[])
 
   for(;;){ // infinite loop
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta);
+    calc_force_chiral(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta,chiral);
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
