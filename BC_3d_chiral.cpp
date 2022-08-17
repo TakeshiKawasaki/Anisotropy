@@ -617,14 +617,14 @@ int calc_force_chiral(double* x, double* y, double* z, double L, double* nx, dou
 //        knz[i] -= diU * (ny[i]*ny[i]*dz - ny[i]*nz[i]*dy - nx[i]*nz[i]*dx + nx[i]*nx[i]*dz) + dcU*(ny[i]*ny[i]*nz[list[i][j]] - ny[i]*nz[i]*ny[list[i][j]] - nx[i]*nz[i]*nx[list[i][j]] + nx[i]*nx[i]*nz[list[i][j]]);
 //        knz[list[i][j]] -= djU * (ny[list[i][j]]*ny[list[i][j]]*dz - ny[list[i][j]]*nz[list[i][j]]*dy - nx[list[i][j]]*nz[list[i][j]]*dx + nx[list[i][j]]*nx[list[i][j]]*dz) + dcU*(nz[i]*ny[list[i][j]]*ny[list[i][j]] - ny[i]*ny[list[i][j]]*nz[list[i][j]] - nx[i]*nx[list[i][j]]*nz[list[i][j]] + nz[i]*nx[list[i][j]]*nx[list[i][j]]);
 
-        knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(1.-cij)*nx[i];
-        knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(1.-cij)*nx[list[i][j]];
+        knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nx[list[i][j]]-cij*nx[i]);
+        knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nx[i]-cij*nx[list[i][j]]);
 
-        kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i])+ chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(cij+1.)*ny[i];
-        kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(1.-cij)*ny[list[i][j]];
+        kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i])+ chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(ny[list[i][j]]-cij*ny[i]);
+        kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(ny[i]-cij*ny[list[i][j]]);
 
- 	knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(1.-cij)*nz[i];
-        knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(1.-cij)*nz[list[i][j]];
+ 	knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]) + chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nz[list[i][j]]-cij*nz[i]);
+        knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]) +chiral*4.*dij*pow(e1,eta)*pow(e2,mu)*(nz[i]-cij*nz[list[i][j]]);
 
 //	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));
 //	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
