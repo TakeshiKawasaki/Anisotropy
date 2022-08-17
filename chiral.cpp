@@ -575,9 +575,9 @@ for (k = 0; k < Np; k++) {
     Ry[k] = sqrt(2. * zeta_r * Th * dt) * gaussian_rand();
     Rz[k] = sqrt(2. * zeta_r * Th * dt) * gaussian_rand();
     n_pr2[k] = nx_pr[k]*nx_pr[k] + ny_pr[k]*ny_pr[k] + nz_pr[k]*nz_pr[k];
-    nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nx_pr[k]*dt + knx[k]*dt + c*knx[k]*dt + Ry[k]*nz[k] - Rz[k]*ny[k] ;
-    ny_pr[k] += -n_pr2[k]*ny[k]*dt - zeta_r*ny_pr[k]*dt + kny[k]*dt + c*kny[k]*dt + Rz[k]*nx[k] - Rx[k]*nz[k] ;
-    nz_pr[k] += -n_pr2[k]*nz[k]*dt - zeta_r*nz_pr[k]*dt + knz[k]*dt + c*knz[k]*dt + Rx[k]*ny[k] - Ry[k]*nx[k] ;
+    nx_pr[k] += -n_pr2[k]*nx[k]*dt - zeta_r*nx_pr[k]*dt + knx[k]*dt + c*knx_c[k]*dt + Ry[k]*nz[k] - Rz[k]*ny[k] ;
+    ny_pr[k] += -n_pr2[k]*ny[k]*dt - zeta_r*ny_pr[k]*dt + kny[k]*dt + c*kny_c[k]*dt + Rz[k]*nx[k] - Rx[k]*nz[k] ;
+    nz_pr[k] += -n_pr2[k]*nz[k]*dt - zeta_r*nz_pr[k]*dt + knz[k]*dt + c*knz_c[k]*dt + Rx[k]*ny[k] - Ry[k]*nx[k] ;
   
     x[k] += vx[k] * dt;
     y[k] += vy[k] * dt;
