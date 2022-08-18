@@ -155,7 +155,7 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_0.6_1.0_rand_affine.dat");
+  sprintf(filename,"coord_0.1_0.6_rand_affine.dat");
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
@@ -581,8 +581,8 @@ int main(int argc, char *argv[])
   double disp_ave;
   int Np = 1000;int count_th=200;
   double disp_th2 = 180;
-  double dt =0.001;//  //parameters;
-  double temp = 0.6;
+  double dt =0.0005;//  //parameters;
+  double temp = 0.1;
   double Th;
   double phi=0.01;
 
@@ -664,12 +664,12 @@ int main(int argc, char *argv[])
 
 for(;;){ // infinite loop
 
-   for(int count=0;count<1000;count++){
+   for(int count=0;count<2000;count++){
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta);   
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
- //   cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+    cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
     count++;
        ///////auto update////////////////////
     calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
@@ -684,12 +684,12 @@ for(;;){ // infinite loop
     }
     
     affine_coord(x, y, z, phi, Np);  
-       phi += 0.001;
+       phi += 0.0005;
      //phi += 0.001*exp(-phi);   
       L = pow((pi*pow(2.,1./2.)*kappa*Np)/(6.*phi),1./3.);
       M=(int)(L/RCHK); 
     
-    if(phi>= 1.0)
+    if(phi>= 0.6)
     break;}
 
 
@@ -700,7 +700,7 @@ for(;;){ // infinite loop
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
-  //   cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
+     cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
      if(count2 > 100000){
     // if(disp_ave>disp_th2){ 
       output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,a,Np); 
