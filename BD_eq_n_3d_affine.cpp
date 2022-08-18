@@ -155,13 +155,16 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_0.1_0.6_rand_affine.dat");
+  sprintf(filename,"coord_0.1_1.0_rand_affine.dat");
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
     x1[i]=x[i]-x_corr;
     y1[i]=y[i]-y_corr;
     z1[i]=z[i]-z_corr;
+    x1[i]-=L*floor(x[i]/L);
+    x1[i]-=L*floor(y[i]/L);
+    x1[i]-=L*floor(z[i]/L);
     //theta1[i] = acos(nz[i]);
     //theta2[i] = atan(ny[i]/(nx[i]+0.000000001));
 
@@ -579,10 +582,10 @@ int main(int argc, char *argv[])
 
   double disp_max=0.0;
   double disp_ave;
-  int Np = 1000;int count_th=200;
+  int Np = 10000;int count_th=200;
   double disp_th2 = 180;
   double dt =0.0005;//  //parameters;
-  double temp = 0.1;
+  double temp = 1.0;
   double Th;
   double phi=0.01;
 
@@ -664,7 +667,7 @@ int main(int argc, char *argv[])
 
 for(;;){ // infinite loop
 
-   for(int count=0;count<2000;count++){
+   for(int count=0;count<10000;count++){
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,list,theta1,theta2,chi,chi_pr,mu,eta);   
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
@@ -684,12 +687,12 @@ for(;;){ // infinite loop
     }
     
     affine_coord(x, y, z, phi, Np);  
-       phi += 0.0005;
+       phi += 0.001;
      //phi += 0.001*exp(-phi);   
       L = pow((pi*pow(2.,1./2.)*kappa*Np)/(6.*phi),1./3.);
       M=(int)(L/RCHK); 
     
-    if(phi>= 0.6)
+    if(phi>= 0.4)
     break;}
 
 
