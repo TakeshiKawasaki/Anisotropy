@@ -596,7 +596,7 @@ int main(int argc, char *argv[])
   int Np = 10000;int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
-  double temp = 1.0;
+  double temp = 3.0;
   double Th;
   double phi=0.001;
 
