@@ -15,3 +15,6 @@ This work is licensed under a
 $$
 \sigma(\hat{\mathbf{u}}_{1},\hat{\mathbf{u}}_2, \hat{\mathbf{r}})\quad = \sigma_{0}(1-\frac{1}{2} \chi\{\frac{(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}+\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2})^{2}}{1+\chi(\mathbf{u}_{1} \cdot \mathbf{u}_{2})}+\frac{(\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{1}-\hat{\mathbf{r}} \cdot \hat{\mathbf{u}}_{2})^{2}}{1-\chi(\mathbf{u}_{1} \cdot \hat{\mathbf{u}}_{2})}\})^{-1 / 2}
 $$
+
+##  <br>
+`python3 pipeline.py --input_dir data --ratio 3' 
