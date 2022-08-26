@@ -18,3 +18,6 @@ $$
 
 ##  <br>
 `python3 pipeline.py --input_dir ../data  --ratio 3`
+
+In case you don't have "pandas", install pandas with python3:
+`pip3 install pandas`
