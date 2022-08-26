@@ -207,8 +207,8 @@ double gaussian_rand(void)
 }
 void affine_coord(double* x,double* y,double* z,double phi,int Np,double dphi){
   for(int k = 0; k < Np; k++){
-    x[k] = pow(phi/(phi + dphi),1./3.)*x[k];
-    y[k] = pow(phi/(phi + dphi),1./3.)*y[k];
+    x[k] = pow(phi/(phi + dphi),1./2.)*x[k];
+    y[k] = pow(phi/(phi + dphi),1./2.)*y[k];
   //  z[k] = pow(phi/(phi + dphi),1./3.)*z[k];
   }
 }
