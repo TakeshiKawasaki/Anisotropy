@@ -669,7 +669,7 @@ int main(void)
   double dt =0.0001;//  //parameters;
   double temp = 0.1;
   double Th;
-  double phi=0.005;
+  double phi=0.001;
   double dphi = 0.0001;
   double phi_final = 0.5;
   
