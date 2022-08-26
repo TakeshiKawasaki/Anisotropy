@@ -467,7 +467,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
       X13 = X12*X;
       
       fw_i = 12.*(-(W13) + (X13));
-      kw[i] -= fw_i;
+      kw[i] = -fw_i;
       
       for (j = 1; j <=list[i][0]; j++)
 	{
@@ -665,7 +665,7 @@ int main(void)
   int Np = 4000;int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
-  double temp = 0.1;
+  double temp = 0.01;
   double Th;
   double phi=0.001;
   double dphi = 0.0001;
