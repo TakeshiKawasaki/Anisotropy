@@ -17,4 +17,4 @@ $$
 $$
 
 ##  <br>
-`python3 pipeline.py --input_dir data --ratio 3' 
+`python3 pipeline.py --input_dir ../data  --ratio 3`
