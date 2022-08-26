@@ -6,7 +6,8 @@
 # include <time.h>
 #include <iomanip> // setprecisionを使用するのに必要
 using namespace std;
-# define Npm 16000
+# define Npm 10000
+
 # define NR 20000
 # define Nn 50
 # define Pm 500
@@ -81,8 +82,7 @@ int calc_disp_max(double *disp_max,double *x,double *y,double *z,double *x_updat
     disp = dx*dx+dy*dy+dz*dz;    
     if(disp > *disp_max)
       *disp_max =disp;    
-  }
-  
+  }  
   return 0;
 }
 
@@ -227,12 +227,12 @@ void ini_hex(double *x,double *y,double*z, double* nx, double* ny,double*nz,doub
       //shift=(double)j*0.5-j/2;
       x[i+num_x*j] = lx*i/2. + lx/2.;
       y[i+num_x*j] = ly*j/2. + ly/2.;
-      z[i+num_x*j] = kappa*pow(2.,1./6.)/2.;
+      z[i+num_x*j] = kappa*1.8/2.;
       nx[i+num_x*j] = unif_rand(-1, 1);
       ny[i+num_x*j] = unif_rand(-1, 1);
       nz[i+num_x*j] = unif_rand(-1, 1);
 //      theta[i+num_x*j] = atan(ny[i+num_x*j]/nx[i+num_x*j]);
-   cout <<  "i = " << "  " << i+num_x*j << " " << ", x = " << "  " << x[i+num_x*j]<< " " << ", y = " << "  " << y[i+num_x*j] << " " << ", z = " << "  " << z[i+num_x*j] << endl;
+      //  cout <<  "i = " << "  " << i+num_x*j << " " << ", x = " << "  " << x[i+num_x*j]<< " " << ", y = " << "  " << y[i+num_x*j] << " " << ", z = " << "  " << z[i+num_x*j] << endl;
       a[i+num_x*j]=1.0;
       k++;
       if(k>=Np)
@@ -327,15 +327,15 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
        // theta1[p] = 1./sqrt(2.);
        // theta2[p] = 1./sqrt(2.);
     }
-         char filename[128];   
-  sprintf(filename,"ini.dat");
-  ofstream file;
-  file.open(filename);
-  for(k = 0; k <Np; k++){
-    file << x[k] << " " <<y[k] << endl; 
-  }
-  file.close();
-  }
+    char filename[128];   
+    sprintf(filename,"ini.dat");
+    ofstream file;
+    file.open(filename);
+    for(k = 0; k <Np; k++){
+      file << x[k] << " " <<y[k] << endl; 
+    }
+    file.close();
+}
 
 
 
@@ -366,129 +366,70 @@ int f(int i,int M)
   return k;
 }
 
-void update(double L,int Np,double *x,double *y,int M,double RCHK,int (*list)[Pm])
-{
-  int i,j,k;
-  int nx,ny;
-  int l,m;
-  double dx,dy,r;
-  
-  int (*map)[Npm]=new int[M*M][Npm];
-  
-  for(i=0;i<M;i++)
-    for(j=0;j<M;j++)
-     	map[i+M*j][0]=0;
-  
-  for(i=0;i<Np;i++){
-    nx=f((int)(x[i]*M/L),M);
-    ny=f((int)(y[i]*M/L),M);
-    
-    for(m=ny-1;m<=ny+1;m++){
-      for(l=nx-1;l<=nx+1;l++){
-	map[f(l,M)+M*f(m,M)][map[f(l,M)+M*f(m,M)][0] +1]=i;
-	map[f(l,M)+M*f(m,M)][0]++;
-	//	printf("%d\n", map[f(l,M)+M*f(m,M)][0]);
-      }
-    }
-  }
-  
-  for(i=0;i<Np;i++){
-    list[i][0]=0;
-    nx = f((int)(x[i]*M/L),M);
-    ny = f((int)(y[i]*M/L),M);
-    
-    for (k=1; k<=(map[nx+M*ny][0]); k++){
-      j = map[nx+M*ny][k];
-      if(j>i){
-	dx =x[i] - x[j];
-	dy =y[i] - y[j];
-		
-	if(dx<-L/2.0)
-	  dx+=L;
-	else if(dx> L/2.0)
-	  dx-=L;
-
-	if(dy<-L/2.0){
-	  dy+=L;
-	}
-	else if(dy> L/2.0)
-	  dy-=L;
-
-	r = dx*dx + dy*dy;
-	
-	if(r<RCHK*RCHK){
-	  list[i][0]++;
-	  list[i][list[i][0]]=j;
-	}
-      }
-    }
-  }
-  delete []map;
-}
-
-void update(double L,int Np,double *x,double *y,double *z,int M,double Rcell,int (* list)[Pm]) 
+void update(double L,double Lz,int Np,double *x,double *y,double *z,int M,int Mz,double Rcell,int (* list)[Pm]) 
 {
   int i,j,k;
   int nx,ny,nz;
   int l,m,n;
   double dx,dy,dz,r;
   
-  int (*map)[Npm]=new int[M*M*M][Npm];
-  for(k=0;k<M;k++)
+  int (*map)[Npm]=new int[M*M*Mz][Npm];
+  for(k=0;k<Mz;k++)
     for(j=0;j<M;j++)
-     for(i=0;i<M;i++)
-     	 map[i+M*j+M*M*k][0]=0;
-  for(i=0;i<Np;i++){
-   nx=f((int)(x[i]*M/L),M);
-   ny=f((int)(y[i]*M/L),M);
-   nz=f((int)(z[i]*M/L),M); //address of particle i is determined. 
-   for(n=nz-1;n<=nz+1;n++){
-    for(m=ny-1;m<=ny+1;m++){
-     for(l=nx-1;l<=nx+1;l++){
-       map[f(l,M)+M*f(m,M)+M*M*f(n,M)][map[f(l,M)+M*f(m,M)+M*M*f(n,M)][0] +1]=i; 
-       map[f(l,M)+M*f(m,M)+M*M*f(n,M)][0]++;
-        }
-       } 
-     }
-}
+      for(i=0;i<M;i++)
+	map[i+M*j+M*M*k][0]=0;
   
-for (i=0;i<Np;i++){ 
-  list[i][0]=0;
-  nx = f((int)(x[i]*M/L),M); 
-  ny = f((int)(y[i]*M/L),M); 
-  nz = f((int)(z[i]*M/L),M);
+  for(i=0;i<Np;i++){
+    nx=f((int)(x[i]*M/L),M);
+    ny=f((int)(y[i]*M/L),M);
+    nz=f((int)(z[i]*Mz/L),Mz); //address of particle i is determined. 
+    for(n=nz-1;n<=nz+1;n++)
+      for(m=ny-1;m<=ny+1;m++)
+	for(l=nx-1;l<=nx+1;l++){
+	  map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][0] +1]=i; 
+	  map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][0]++;
+        }
+  } 
+  
+  
+  
+  for (i=0;i<Np;i++){ 
+    list[i][0]=0;
+    nx = f((int)(x[i]*M/L),M); 
+    ny = f((int)(y[i]*M/L),M); 
+    nz = f((int)(z[i]*Mz/L),Mz);
     
-  for (k=1; k<=(map[nx+M*ny+M*M*nz][0]); k++){ 
-    j = map[nx+M*ny+M*M*nz][k];
-    if(j>i) {
-      dx =x[i] - x[j]; 
-      dy =y[i] - y[j]; 
-      dz =z[i] - z[j];
-
-      if(dx<-L/2.0) 
-        dx+=L;
-      else if(dx> L/2.0) 
-        dx-=L;
-      if(dy<-L/2.0)
-        dy+=L;
-      else if(dy> L/2.0)
-       dy-=L;
-      if(dz<-L/2.0)
-       dz+=L;
-      else if(dz> L/2.0)
-       dz-=L;
-
-      r = dx*dx + dy*dy + dz*dz;
-
-      if(r<Rcell*Rcell){ 
-        list[i][0]++;
-        list[i][list[i][0]]=j;
+    for (k=1; k<=(map[nx+M*ny+M*M*nz][0]); k++){ 
+      j = map[nx+M*ny+M*M*nz][k];
+      if(j>i) {
+	dx =x[i] - x[j]; 
+	dy =y[i] - y[j]; 
+	dz =z[i] - z[j];
+	
+	if(dx<-L/2.0) 
+	  dx+=L;
+	else if(dx> L/2.0) 
+	  dx-=L;
+	if(dy<-L/2.0)
+	  dy+=L;
+	else if(dy> L/2.0)
+	  dy-=L;
+	if(dz<-Lz/2.0)
+	  dz+=Lz;
+	else if(dz> Lz/2.0)
+	  dz-=Lz;
+	
+	r = dx*dx + dy*dy + dz*dz;
+	
+	if(r<Rcell*Rcell){ 
+	  list[i][0]++;
+	  list[i][list[i][0]]=j;
+	}
       }
     }
   }
-}
-delete
-[]map;
+  delete
+    []map;
 }
 
 int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny, double* nz,int Np, double* a, double* kx, double* ky,double* kz,double *knx,double *kny,double *knz,double*kw,int (*list)[Pm],double *theta1,double *theta2,double chi,double chi_pr,double mu,double eta,double kappa) {
@@ -510,7 +451,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
     kny[k] = 0.0;
     knz[k] = 0.0;
   }
- for (i = 0; i < Np; i++)
+  for (i = 0; i < Np; i++)
     {
       for (j = 1; j <=list[i][0]; j++)
 	{
@@ -529,10 +470,10 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
             dz -= L;
           if (dz < -(0.5 * L))
             dz += L;
-
+	  
           aij = (a[list[i][j]] + a[i]) / 2.0;
           aij3 = aij*aij*aij;
-
+	  
 	  // cout<<theta[list[i][j]]<<endl;
           r = sqrt(dx*dx + dy*dy + dz*dz);
           r2 = dx*dx + dy*dy + dz*dz;
@@ -549,14 +490,14 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
  	    R2n =(ri-rj)*(ri-rj)/(1-chi*cij);
  	    R1p =(ri+rj)/(1+chi*cij);
  	    R1n =(ri-rj)/(1-chi*cij);
-
+	    
  	    R2p_pr =(ri+rj)*(ri+rj)/(1+chi_pr*cij);
  	    R2n_pr =(ri-rj)*(ri-rj)/(1-chi_pr*cij);
  	    R1p_pr =(ri+rj)/(1+chi_pr*cij);
  	    R1n_pr =(ri-rj)/(1-chi_pr*cij);    
-	    	    
-	     aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
-        aij_pr3 = aij_pr*aij_pr*aij_pr;
+	    
+	    aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
+	    aij_pr3 = aij_pr*aij_pr*aij_pr;
 	    
 	    A1 = (aij/(r-aij_pr+aij));
 	    A2 =A1*A1;
@@ -565,22 +506,22 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    
 	    A = A12-A6;
 	    B = 12.*A12*A1-6.*A6*A1;
-
-       Lz = kappa*1.2;
-
-        W =  (aij/z[i]);
-        W2 = W*W;
-        W6 = W2*W2*W2;
-        W12 = W6*W6;
-        W13 = W12*W;
-
-        X =  (aij/(Lz - z[i]));
-        X2 = W*W;
-        X6 = W2*W2*W2;
-        X12 = W6*W6;
-        X13 = W12*W;
-
-
+	    
+	    Lz = kappa*1.8;
+	    
+	    W =  (aij/z[i]);
+	    W2 = W*W;
+	    W6 = W2*W2*W2;
+	    W12 = W6*W6;
+	    W13 = W12*W;
+	    
+	    X =  (aij/(Lz - z[i]));
+	    X2 = W*W;
+	    X6 = W2*W2*W2;
+	    X12 = W6*W6;
+	    X13 = W12*W;
+	    
+	    
 	    
 	    
 	    //	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
@@ -592,49 +533,49 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    
 	    drU = 4.*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr)/e2/r3)*(R2p_pr+R2n_pr)-((aij_pr3*chi*B)/2./aij3/r3)*(R2p+R2n)-B/aij);//analytical calculation of the 1'st derivative / r
 	    diU = 4.*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr+R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p+R1n));//analytical calculation of the 1'st derivative / r*ni
-        djU = 4.*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr-R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
-        dcU = 4.*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr*chi_pr)/2./e2/r2)*(R1p_pr*R1p_pr-R1n_pr*R1n_pr)-((aij_pr3*chi*chi*B)/4./aij3/r2)*(R1p*R1p-R1n*R1n)+A*eta*chi*chi*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
-    
+	    djU = 4.*pow(e1,eta)*pow(e2,mu)*(-((A*mu*chi_pr)/e2/r2)*(R1p_pr-R1n_pr)+((aij_pr3*chi*B)/2./aij3/r2)*(R1p-R1n));//analytical calculation of the 1'st derivative / r*nj
+	    dcU = 4.*pow(e1,eta)*pow(e2,mu)*(((A*mu*chi_pr*chi_pr)/2./e2/r2)*(R1p_pr*R1p_pr-R1n_pr*R1n_pr)-((aij_pr3*chi*chi*B)/4./aij3/r2)*(R1p*R1p-R1n*R1n)+A*eta*chi*chi*cij*e1*e1);//analytical calculation of the 1'st derivative / ri*ni
+	    
 	    fx_ij = drU*dx/r+diU*nx[i]+djU*nx[list[i][j]];  //du/dr
 	    fy_ij = drU*dy/r+diU*ny[i]+djU*ny[list[i][j]];
-        fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]];
+	    fz_ij = drU*dz/r+diU*nz[i]+djU*nz[list[i][j]];
 	    
 	    kx[i] -= fx_ij;
 	    kx[list[i][j]] += fx_ij;
 	    
 	    ky[i] -= fy_ij;	    
 	    ky[list[i][j]] += fy_ij;
-
-        kz[i] -= fz_ij;
-	    kz[list[i][j]] += fz_ij;
-
-         fw_i = 12.*(-(W13/aij) + (X13/aij));
-         kw[i] += fw_i;
-
-// -du/dn 
-//        knx[i] -= diU * (nz[i]*nz[i]*dx - nx[i]*nz[i]*dz - nx[i]*ny[i]*dy + ny[i]*ny[i]*dx) + dcU*(nz[i]*nz[i]*nx[list[i][j]] - nx[i]*nz[i]*nz[list[i][j]] - nx[i]*ny[i]*ny[list[i][j]] + ny[i]*ny[i]*nx[list[i][j]]);
-//        knx[list[i][j]] -= djU * (nz[list[i][j]]*nz[list[i][j]]*dx - nx[list[i][j]]*nz[list[i][j]]*dz - nx[list[i][j]]*ny[list[i][j]]*dy + ny[list[i][j]]*ny[list[i][j]]*dx) + dcU*(nx[i]*nz[list[i][j]]*nz[list[i][j]] - nz[i]*nx[list[i][j]]*nz[list[i][j]] - ny[i]*nx[list[i][j]]*ny[list[i][j]] + nx[i]*ny[list[i][j]]*ny[list[i][j]]);
-
-//        kny[i] -= diU * (nx[i]*nx[i]*dy - nx[i]*ny[i]*dx - ny[i]*nz[i]*dz + nz[i]*nz[i]*dy) + dcU*(nx[i]*nx[i]*ny[list[i][j]] - nx[i]*ny[i]*nx[list[i][j]] - ny[i]*nz[i]*nz[list[i][j]] + nz[i]*nz[i]*ny[list[i][j]]);
-//        kny[list[i][j]] -= djU * (nx[list[i][j]]*nx[list[i][j]]*dy - nx[list[i][j]]*ny[list[i][j]]*dx - ny[list[i][j]]*nz[list[i][j]]*dz + nz[list[i][j]]*nz[list[i][j]]*dy) + dcU*(ny[i]*nx[list[i][j]]*nx[list[i][j]] - nx[i]*nx[list[i][j]]*ny[list[i][j]] - nz[i]*ny[list[i][j]]*nz[list[i][j]] + ny[i]*nz[list[i][j]]*nz[list[i][j]]);
-
-//        knz[i] -= diU * (ny[i]*ny[i]*dz - ny[i]*nz[i]*dy - nx[i]*nz[i]*dx + nx[i]*nx[i]*dz) + dcU*(ny[i]*ny[i]*nz[list[i][j]] - ny[i]*nz[i]*ny[list[i][j]] - nx[i]*nz[i]*nx[list[i][j]] + nx[i]*nx[i]*nz[list[i][j]]);
-//        knz[list[i][j]] -= djU * (ny[list[i][j]]*ny[list[i][j]]*dz - ny[list[i][j]]*nz[list[i][j]]*dy - nx[list[i][j]]*nz[list[i][j]]*dx + nx[list[i][j]]*nx[list[i][j]]*dz) + dcU*(nz[i]*ny[list[i][j]]*ny[list[i][j]] - ny[i]*ny[list[i][j]]*nz[list[i][j]] - nx[i]*nx[list[i][j]]*nz[list[i][j]] + nz[i]*nx[list[i][j]]*nx[list[i][j]]);;
-        
-
-        knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]);
-        knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]);
-  
-        kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i]);
-        kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]);
-
-	      knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]);
-        knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]);
-//	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
-//	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
 	    
-        
-        U1=4.*pow(e1,eta)*pow(e2,mu)*A;
+	    kz[i] -= fz_ij;
+	    kz[list[i][j]] += fz_ij;
+	    
+	    fw_i = 12.*(-(W13/aij) + (X13/aij));
+	    kw[i] -= fw_i;
+	    
+	    // -du/dn 
+	    //        knx[i] -= diU * (nz[i]*nz[i]*dx - nx[i]*nz[i]*dz - nx[i]*ny[i]*dy + ny[i]*ny[i]*dx) + dcU*(nz[i]*nz[i]*nx[list[i][j]] - nx[i]*nz[i]*nz[list[i][j]] - nx[i]*ny[i]*ny[list[i][j]] + ny[i]*ny[i]*nx[list[i][j]]);
+	    //        knx[list[i][j]] -= djU * (nz[list[i][j]]*nz[list[i][j]]*dx - nx[list[i][j]]*nz[list[i][j]]*dz - nx[list[i][j]]*ny[list[i][j]]*dy + ny[list[i][j]]*ny[list[i][j]]*dx) + dcU*(nx[i]*nz[list[i][j]]*nz[list[i][j]] - nz[i]*nx[list[i][j]]*nz[list[i][j]] - ny[i]*nx[list[i][j]]*ny[list[i][j]] + nx[i]*ny[list[i][j]]*ny[list[i][j]]);
+	    
+	    //        kny[i] -= diU * (nx[i]*nx[i]*dy - nx[i]*ny[i]*dx - ny[i]*nz[i]*dz + nz[i]*nz[i]*dy) + dcU*(nx[i]*nx[i]*ny[list[i][j]] - nx[i]*ny[i]*nx[list[i][j]] - ny[i]*nz[i]*nz[list[i][j]] + nz[i]*nz[i]*ny[list[i][j]]);
+	    //        kny[list[i][j]] -= djU * (nx[list[i][j]]*nx[list[i][j]]*dy - nx[list[i][j]]*ny[list[i][j]]*dx - ny[list[i][j]]*nz[list[i][j]]*dz + nz[list[i][j]]*nz[list[i][j]]*dy) + dcU*(ny[i]*nx[list[i][j]]*nx[list[i][j]] - nx[i]*nx[list[i][j]]*ny[list[i][j]] - nz[i]*ny[list[i][j]]*nz[list[i][j]] + ny[i]*nz[list[i][j]]*nz[list[i][j]]);
+	    
+	    //        knz[i] -= diU * (ny[i]*ny[i]*dz - ny[i]*nz[i]*dy - nx[i]*nz[i]*dx + nx[i]*nx[i]*dz) + dcU*(ny[i]*ny[i]*nz[list[i][j]] - ny[i]*nz[i]*ny[list[i][j]] - nx[i]*nz[i]*nx[list[i][j]] + nx[i]*nx[i]*nz[list[i][j]]);
+	    //        knz[list[i][j]] -= djU * (ny[list[i][j]]*ny[list[i][j]]*dz - ny[list[i][j]]*nz[list[i][j]]*dy - nx[list[i][j]]*nz[list[i][j]]*dx + nx[list[i][j]]*nx[list[i][j]]*dz) + dcU*(nz[i]*ny[list[i][j]]*ny[list[i][j]] - ny[i]*ny[list[i][j]]*nz[list[i][j]] - nx[i]*nx[list[i][j]]*nz[list[i][j]] + nz[i]*nx[list[i][j]]*nx[list[i][j]]);;
+	    
+	    
+	    knx[i] -= diU*(dx - ri*nx[i]) + dcU*(nx[list[i][j]] - cij*nx[i]);
+	    knx[list[i][j]] -= djU*(dx - rj*nx[list[i][j]]) + dcU*(nx[i] - cij*nx[list[i][j]]);
+	    
+	    kny[i] -= diU*(dy - ri*ny[i]) + dcU*(ny[list[i][j]] - cij*ny[i]);
+	    kny[list[i][j]] -= djU*(dy - rj*ny[list[i][j]]) + dcU*(ny[i] - cij*ny[list[i][j]]);
+	    
+	    knz[i] -= diU*(dz - ri*nz[i]) + dcU*(nz[list[i][j]] - cij*nz[i]);
+	    knz[list[i][j]] -= djU*(dz - rj*nz[list[i][j]]) + dcU*(nz[i] - cij*nz[list[i][j]]);
+	    //	    kth[i]         -=diU*(cos(theta[i])*dy-sin(theta[i])*dx)+dcU*(cos(theta[i])*sin(theta[list[i][j]])-sin(theta[i])*cos(theta[list[i][j]]));  
+	    //	    kth[list[i][j]]-=djU*(cos(theta[list[i][j]])*dy-sin(theta[list[i][j]])*dx)+dcU*(cos(theta[list[i][j]])*sin(theta[i])-sin(theta[list[i][j]])*cos(theta[i]));
+	    
+	    
+	    U1=4.*pow(e1,eta)*pow(e2,mu)*A;
 	  }
         }
     }
@@ -691,64 +632,67 @@ int eq_motion(double* x, double* y,double* z,double* theta1,double* theta2, doub
     ny[k] += ny_pr[k] * dt;
     nz[k] += nz_pr[k] * dt;
 
-//    n[k] = sqrt(nx[k] * nx[k] + ny[k] * ny[k] + nz[k] * nz[k]);
+    //    n[k] = sqrt(nx[k] * nx[k] + ny[k] * ny[k] + nz[k] * nz[k]);
     n = sqrt(nx[k] * nx[k] + ny[k] * ny[k] + nz[k] * nz[k]);
-   //cout << std::fixed << std::setprecision(16) << n << endl;
-  //   cout << "n=" << " " <<  n << " " << k << endl;
-
+    //cout << std::fixed << std::setprecision(16) << n << endl;
+    //   cout << "n=" << " " <<  n << " " << k << endl;
+    
 //    nx[k] = nx[k] / n[k];
 //    ny[k] = ny[k] / n[k];
 //    nz[k] = nz[k] / n[k];
-
+    
     nx[k] = nx[k] / n;
     ny[k] = ny[k] / n;
     nz[k] = nz[k] / n;
-
+    
 //    theta1[k] = acos(nz[k]);
- //   theta2[k] = acos(nx[k]/(sin(theta1[k])+0.000000001));
-
-   
+    //   theta2[k] = acos(nx[k]/(sin(theta1[k])+0.000000001));
+    
+    
     *avK += vx[k]*vx[k] + vy[k]*vy[k] + vz[k]*vz[k] + (nx_pr[k]*nx_pr[k] + ny_pr[k]*ny_pr[k] + nz_pr[k]*nz_pr[k])/(nx[k] * nx[k] + ny[k] * ny[k] + nz[k] * nz[k]);
   }
   *avK = *avK / Np / 2.0/ 2.5;
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
   srand((unsigned) time(NULL));
   double t,avU=0.0,avU2=0.0,avU0=0.0,avK=0.0,avK0=0.0,dummy;
   double x_corr=0.0,y_corr=0.0,z_corr=0.0;
   int i,count=0,count_num_update=0;
-
+  
   double disp_max=0.0,disp_th2 =10.;
   double disp_ave;
-  int Np = 10000;int count_th=200;
+  int Np = 4000;int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
-  double temp = 2.0;
+  double temp = 0.1;
   double Th;
   double phi=0.005;
-  double dphi = 0.001;
+  double dphi = 0.0005;
   double phi_final = 1.0;
-
-
+  
   double kappa = 3.; // shape anisotropy parameter
   double kappa_pr = 20.; // energy anisotropy parameter
   double chi = (kappa*kappa-1.)/(kappa*kappa+1.); //atof(argv[1]);  
- 
+  
   double eta = 1.0;
   double mu = 2.0;
   double chi_pr = (pow(kappa_pr,1./mu)-1.)/(pow(kappa_pr,1./mu)+1.) ; 
-
+  
   double timer;
-
+  
   double RCHK=5.0;// cut off +1.0
-  double L;
-       //  L = pow((pi*pow(2.,1./2.)*kappa*Np)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
-       L = (1.0/2.0)*sqrt(pow(2.,1./3.)*pi*kappa*Np/(kappa*1.2*phi));
-  int M;
-         M=(int)(L/RCHK);
+  double L,Lz;
+  //  L = pow((pi*pow(2.,1./2.)*kappa*Np)/(6.*phi),1./3.);//(r1+r2)/4.0*sqrt(pow(2.,1./3.)*pi*kappa*Np/phi);
+  L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*1.8*phi));
+  Lz = 40.;
+
+  int M,Mz;
+  M=(int)(L/RCHK);
+  Mz=(int)(Lz/RCHK);
+  
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
   double* x, * y, *z,* x0, * y0, *z0,* vx, * vy,*vz, * a, * kx, * ky,*kz, * knx,* kny,* knz, * nx,* ny,* nz, * nx_pr,* ny_pr,* nz_pr,*x_update,*y_update,*z_update, *theta1, *theta2 ,*omega,*r1,*kw;
@@ -789,91 +733,92 @@ int main(int argc, char *argv[])
   
   // ini_coord_square(x,y,theta,a,L,Np);
   //ini_hex(x,y,theta,a,L,Np);
- 
+  
   //ini_fcc(x,y,z,nx,ny,nz,theta1,theta2,a,L,Np,r1,kappa);
- ini_hex(x,y,z,nx,ny,nz,theta1,a,L,Np,kappa);
+  ini_hex(x,y,z,nx,ny,nz,theta1,a,L,Np,kappa);
   ini(vx, vy, vz, nx_pr, ny_pr, nz_pr, Np,omega);  
   
-
   
-  sprintf(filename,"%s/energy_time.txt",argv[1]);
+  
+  sprintf(filename,"energy_time.txt");
   ofstream file;
   file.open(filename);
   
- cout << "before cell list" << endl;
-  update(L,Np,x,y,z,M,RCHK,list);
+  cout << "before cell list" << endl;
+  update(L,Lz,Np,x,y,z,M,Mz,RCHK,list);
   avU0=0.0;
   disp_ave = 0.0;
- cout << "done cell list" << endl;
-
+  cout << "done cell list" << endl;
+  
   count=0;
   timer=0.0;
   
   copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
   copy(x0,y0,z0,x,y,z,Np,x_corr,y_corr,z_corr);
-
-for(;;){ // infinite loop
-
-   for(int count=0;count<1000;count++){
-    calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,list,theta1,theta2,chi,chi_pr,mu,eta,kappa);   
-    eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw, Np, &avK0,temp);
-    com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
-    p_bound(x, y, z, Np, L);
- cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
-    count++;
-       ///////auto update////////////////////
-    calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
-    count_num_update++;
-    if(disp_max>0.5*0.5){
-      update(L,Np,x,y,z,M,RCHK,list);
-      disp_max=0.0;
-      copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
-      count_num_update=0;
-    }
-    ////////////////////////////
-    }
-
+  
+  for(;;){ // infinite loop
     
+    for(int count=0;count<1000;count++){
+      calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,list,theta1,theta2,chi,chi_pr,mu,eta,kappa);   
+      eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw, Np, &avK0,temp);
+      com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
+      p_bound(x, y, z, Np, L);
+      cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+      count++;
+      ///////auto update////////////////////
+      calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
+      count_num_update++;
+      if(disp_max>0.5*0.5){
+	update(L,Lz,Np,x,y,z,M,Mz,RCHK,list);
+	disp_max=0.0;
+	copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
+	count_num_update=0;
+      }
+      ////////////////////////////
+    }
+    
+   
     affine_coord(x, y, z, phi, Np,dphi);  
-       phi += dphi;
-     //phi += 0.001*exp(-phi);   
-      L = (1.0/2.0)*sqrt(pow(2.,1./3.)*pi*kappa*Np/(kappa*1.2*phi));
-      M=(int)(L/RCHK); 
+    phi += dphi;
+    //phi += 0.001*exp(-phi);   
+    //    L = (1.0/2.0)*sqrt(pow(2.,1./3.)*pi*kappa*Np/(kappa*1.2*phi));
+    L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*1.8*phi));
+    M=(int)(L/RCHK); 
     if(phi>= phi_final)
-    break;}
-
-
-    disp_ave = 0.0;
-    int count2 = 0;
-    for(;;){
+      break;}
+  
+  
+  disp_ave = 0.0;
+  int count2 = 0;
+  for(;;){
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,list,theta1,theta2,chi,chi_pr,mu,eta,kappa);  
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, kw,Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
-   //  cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
-     if(count2 > 1000000){
-    //if(disp_ave>disp_th2){ 
+    //  cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
+    if(count2 > 1000000){
+      //if(disp_ave>disp_th2){ 
       output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,r1,Np); 
       break;
-      }//}
-   ///////auto update////////////////////
+    }//}
+    ///////auto update////////////////////
     calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
-     count2++;
+    count2++;
     count_num_update++;
     if(disp_max>0.5*0.5){
-      update(L,Np,x,y,z,M,RCHK,list);
+      update(L,Lz,Np,x,y,z,M,Mz,RCHK,list);
       disp_max=0.0;
       copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
       count_num_update=0;
     }
     ////////////////////////////
     
-    }
-    
- 
+  }
+  
+  
   
   file.close();
-   
+  
   
   delete[] x;
   delete[] y;
