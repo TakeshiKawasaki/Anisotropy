@@ -670,8 +670,8 @@ int main(void)
   double temp = 0.1;
   double Th;
   double phi=0.005;
-  double dphi = 0.0005;
-  double phi_final = 1.0;
+  double dphi = 0.0001;
+  double phi_final = 0.5;
   
   double kappa = 3.; // shape anisotropy parameter
   double kappa_pr = 20.; // energy anisotropy parameter
