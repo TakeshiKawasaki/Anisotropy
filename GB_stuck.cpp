@@ -760,7 +760,7 @@ int main(void)
       eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw, Np, &avK0,temp);
       com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
       p_bound(x, y, z, Np, L);
-      cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << z[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+      cout <<"disp= "<< disp_ave <<" " << "z= "<<" " << z[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
       count++;
       ///////auto update////////////////////
       calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
@@ -792,7 +792,7 @@ int main(void)
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz, kw,Np, &avK0,temp);
     com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
     p_bound(x, y, z, Np, L);
-    //  cout <<"disp="<< disp_ave <<"z="<< z[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
+    //  cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
     if(count2 > 1000000){
       //if(disp_ave>disp_th2){
       output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,r1,Np);
