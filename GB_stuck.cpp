@@ -324,7 +324,7 @@ void ini_fcc(double *x,double *y,double*z,double* nx,double* ny, double* nz, dou
         nz[p] = unif_rand(-1, 1);
         a[p] = 1.;
         r1[p] = pow(2.,1./6);
-       // theta1[p] = 1./sqrt(2.);
+      // theta1[p] = 1./sqrt(2.);
        // theta2[p] = 1./sqrt(2.);
     }
     char filename[128];   
@@ -451,8 +451,24 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
     kny[k] = 0.0;
     knz[k] = 0.0;
   }
+ Lz = kappa*1.8;
   for (i = 0; i < Np; i++)
     {
+      W =  (1.0/z[i]);
+      W2 = W*W;
+      W6 = W2*W2*W2;
+      W12 = W6*W6;
+      W13 = W12*W;
+      
+      X =  (1.0/(Lz - z[i]));
+      X2 = X*X;
+      X6 = X2*X2*X2;
+      X12 = X6*X6;
+      X13 = X12*X;
+      
+      fw_i = 12.*(-(W13) + (X13));
+      kw[i] -= fw_i;
+      
       for (j = 1; j <=list[i][0]; j++)
 	{
           dx = x[i] - x[list[i][j]];
@@ -507,23 +523,8 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    A = A12-A6;
 	    B = 12.*A12*A1-6.*A6*A1;
 	    
-	    Lz = kappa*1.8;
-	    
-	    W =  (aij/z[i]);
-	    W2 = W*W;
-	    W6 = W2*W2*W2;
-	    W12 = W6*W6;
-	    W13 = W12*W;
-	    
-	    X =  (aij/(Lz - z[i]));
-	    X2 = W*W;
-	    X6 = W2*W2*W2;
-	    X12 = W6*W6;
-	    X13 = W12*W;
-	    
-	    
-	    
-	    
+
+	   	    
 	    //	    e1 = 1/sqrt(1-chi*chi-cij*cij);  //epsilon1
 	    e1 = 1./sqrt(1-chi*chi*cij*cij);  //epsilon1
 	    e2 = 1.-(chi_pr/2./r2)*(R2p_pr+R2n_pr); // epsilon2
@@ -548,10 +549,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    
 	    kz[i] -= fz_ij;
 	    kz[list[i][j]] += fz_ij;
-	    
-	    fw_i = 12.*(-(W13/aij) + (X13/aij));
-	    kw[i] -= fw_i;
-	    
+	    	    
 	    // -du/dn 
 	    //        knx[i] -= diU * (nz[i]*nz[i]*dx - nx[i]*nz[i]*dz - nx[i]*ny[i]*dy + ny[i]*ny[i]*dx) + dcU*(nz[i]*nz[i]*nx[list[i][j]] - nx[i]*nz[i]*nz[list[i][j]] - nx[i]*ny[i]*ny[list[i][j]] + ny[i]*ny[i]*nx[list[i][j]]);
 	    //        knx[list[i][j]] -= djU * (nz[list[i][j]]*nz[list[i][j]]*dx - nx[list[i][j]]*nz[list[i][j]]*dz - nx[list[i][j]]*ny[list[i][j]]*dy + ny[list[i][j]]*ny[list[i][j]]*dx) + dcU*(nx[i]*nz[list[i][j]]*nz[list[i][j]] - nz[i]*nx[list[i][j]]*nz[list[i][j]] - ny[i]*nx[list[i][j]]*ny[list[i][j]] + nx[i]*ny[list[i][j]]*ny[list[i][j]]);
@@ -738,8 +736,7 @@ int main(void)
   ini_hex(x,y,z,nx,ny,nz,theta1,a,L,Np,kappa);
   ini(vx, vy, vz, nx_pr, ny_pr, nz_pr, Np,omega);  
   
-  
-  
+    
   sprintf(filename,"energy_time.txt");
   ofstream file;
   file.open(filename);
@@ -763,7 +760,7 @@ int main(void)
       eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw, Np, &avK0,temp);
       com_correction(x,y,z,&x_corr,&y_corr,&z_corr, Np, L);
       p_bound(x, y, z, Np, L);
-      cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+      cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << z[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
       count++;
       ///////auto update////////////////////
       calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
@@ -814,8 +811,6 @@ int main(void)
     ////////////////////////////
     
   }
-  
-  
   
   file.close();
   
