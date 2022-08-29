@@ -513,7 +513,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
        if(i>list[i][j]){
        double V ;
        V = L*L*L;
-       *p += (1./3./V)*(dx*kx[i] + dy*ky[i] + dz*kz[i]);
+       *p += (1./3./V)*(dx*fx_ij + dy*fy_ij + dz*fz_ij);
        }
       // count++;
 
