@@ -155,7 +155,7 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_pcal_T1.5_bete_cut5.9_Np10000_phi0.%d.dat",count_file);
+  sprintf(filename,"coord_pcal_T0.5_bete_cut5.9_Np10000_phi0.%d.dat",count_file);
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
@@ -509,11 +509,11 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    kz[list[i][j]] += fz_ij;
 
        // Calculation of pressure //
-       if(i>list[i][j]){
+  
        double V ;
        V = L*L*L;
        *p += -(1./3./V)*(dx*fx_ij + dy*fy_ij + dz*fz_ij);
-       }
+       
       // count++;
 
 
@@ -629,7 +629,7 @@ int main(int argc, char *argv[])
   int Np = 10000;int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
-  double temp = 1.5; // do  1.5 1.0 0.8 0.5 
+  double temp = 0.5; // do  1.5 1.0 0.8 0.5 
   double Th;
   double phi=0.001;
   double dphi = 0.0005;
@@ -712,7 +712,7 @@ int main(int argc, char *argv[])
   copy(x0,y0,z0,x,y,z,Np,x_corr,y_corr,z_corr);
 
 
-   sprintf(filename,"pressure_T1.5.txt");
+   sprintf(filename,"pressure_T0.5.txt");
   ofstream file;
   file.open(filename);
 
