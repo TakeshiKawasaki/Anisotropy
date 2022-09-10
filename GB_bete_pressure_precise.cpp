@@ -699,7 +699,7 @@ int main(int argc, char *argv[])
   file.open(filename);
  file <<"#"<<" "<<"phi"<<" "<<"rho"<<" "<<"temp"<<" "<<"avU"<<" "<<"cv"<<" "<<"p"<<" "<<"p/T"<<endl;
 
-for(phi_final = 0.1; phi_final <= 1.0; phi_final+= 0.1){
+for(phi_final = 0.1; phi_final <= 1.4; phi_final+= 0.1){
    avK=0.0,avK0=0.0, p0=0.0,p=0.0,avU=0.0,avU2=0.0;
 
 
