@@ -120,7 +120,7 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_c1.0_T0.1_phi0.%d_chiral_confine_GBwall_bete_Np10000.dat",count_file);
+  sprintf(filename,"coord_a_c1.0_T0.1_phi0.%d_chiral_confine_GBwall_bete_Np10000.dat",count_file);
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
@@ -189,7 +189,7 @@ void ini_hex(double *x,double *y,double*z, double* nx, double* ny,double*nz,doub
       //shift=(double)j*0.5-j/2;
       x[i+num_x*j] = lx*i + lx/2.;
       y[i+num_x*j] = ly*j + ly/2.;
-      z[i+num_x*j] = kappa*pow(2.,1./6.)/2.;
+      z[i+num_x*j] = kappa/2.;//kappa*pow(2.,1./6.)/2.;
       nx[i+num_x*j] = unif_rand(-1., 1.);
       ny[i+num_x*j] = unif_rand(-1., 1.);
       nz[i+num_x*j] = unif_rand(-1., 1.);
@@ -435,7 +435,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
   double  lw_low, lw_high; 
   double aij_w, aij_pr_w_low, aij_pr_w_high, aij_w3, aij_pr3_w_low, aij_pr3_w_high;
 
-  Lz = kappa*pow(2.,1./6.);
+  Lz = kappa;//kappa*pow(2.,1./6.);
   double V = L*L*Lz;
  
   // cut = 2.0;
@@ -469,7 +469,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 
 
 
-          Lz = kappa*pow(2.,1./6.);
+         
           lw_low = z[i];
           lw_high = z[i] - Lz;
           
@@ -614,13 +614,12 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 
 
 
+
 	  if(r2< 5.061296*5.061296){  // the force by potential energy would work if the distance is smaller than 3*(charcteristic length) maybe i better put it just after calculating r??
 	    
-	    ri = dx*nx[i] + dy*ny[i] + dz*nz[i];
+	 	    ri = dx*nx[i] + dy*ny[i] + dz*nz[i];
 	    rj = dx*nx[list[i][j]] + dy*ny[list[i][j]] + dz*nz[list[i][j]];
 	    cij = nx[i]*nx[list[i][j]] + ny[i]*ny[list[i][j]] + nz[i]*nz[list[i][j]];
-        dij = dx*(ny[i]*nz[list[i][j]] - nz[i]*ny[list[i][j]]) + dy*(nz[i]*nx[list[i][j]] - nx[i]*nz[list[i][j]]) + dz*(nx[i]*ny[list[i][j]] - ny[i]*nx[list[i][j]]);
-	    
 	    
 	    
 	    R2p =(ri+rj)*(ri+rj)/(1+chi*cij);
@@ -628,12 +627,18 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
  	    R1p =(ri+rj)/(1+chi*cij);
  	    R1n =(ri-rj)/(1-chi*cij);
 
+         aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
+         cut = pow(2.,1./6.)-1+aij_pr/aij;
+	
+        dij = dx*(ny[i]*nz[list[i][j]] - nz[i]*ny[list[i][j]]) + dy*(nz[i]*nx[list[i][j]] - nx[i]*nz[list[i][j]]) + dz*(nx[i]*ny[list[i][j]] - ny[i]*nx[list[i][j]]);
+	    
+
  	    R2p_pr =(ri+rj)*(ri+rj)/(1+chi_pr*cij);
  	    R2n_pr =(ri-rj)*(ri-rj)/(1-chi_pr*cij);
  	    R1p_pr =(ri+rj)/(1+chi_pr*cij);
  	    R1n_pr =(ri-rj)/(1-chi_pr*cij);    
 	    	    
-	     aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
+	
         aij_pr3 = aij_pr*aij_pr*aij_pr;
 	    
 	    A1 = (aij/(r-aij_pr+aij));
@@ -702,7 +707,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    
         
               // Chiral//
-
+        
 	    drUc = 4.*pow(e1,eta)*pow(e2,mu)*dij*cij*(((A_c*mu*chi_pr)/e2/r4)*(R2p_pr + R2n_pr) - ((aij_pr3*chi*B_c)/2./aij3/r4)*(R2p + R2n) - B_c/aij/r - A_c/r2);//analytical calculation of the 1'st derivative / r
 	    diUc = 4.*pow(e1,eta)*pow(e2,mu)*dij*cij*(-((A_c*mu*chi_pr)/e2/r3)*(R1p_pr + R1n_pr) + ((aij_pr3*chi*B_c)/2./aij3/r3)*(R1p + R1n));//analytical calculation of the 1'st derivative / r*ni
         djUc = 4.*pow(e1,eta)*pow(e2,mu)*dij*cij*(-((A_c*mu*chi_pr)/e2/r3)*(R1p_pr - R1n_pr) + ((aij_pr3*chi*B_c)/2./aij3/r3)*(R1p - R1n));//analytical calculation of the 1'st derivative / r*ni
@@ -827,7 +832,7 @@ int main(int argc, char *argv[])
 
   double disp_max=0.0,disp_th2 =10.;
   double disp_ave;
-  int Np = 10000;//10000;
+  int Np = 1000;//10000;
   int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
@@ -851,13 +856,13 @@ int main(int argc, char *argv[])
 
   double RCHK=6.061296;// cut off +1.0
   double L,Lz;
-      L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*pow(2.,1./6.)*phi));
+      L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*phi));
        Lz = 40.;
   int M,Mz;
          M=(int)(L/RCHK);
          Mz=(int)(Lz/RCHK);
     
-   double lz=kappa*pow(2.,1./6.);
+   double lz=kappa;//kappa*pow(2.,1./6.);
 
    double rho=Np/L/L/lz;
   cout << "L=" << L <<" "<< "M="<<M <<endl;
@@ -920,7 +925,7 @@ int main(int argc, char *argv[])
   
  // cout << "ini" << endl;
 
-  sprintf(filename,"p_precise_c1.0_T0.1_chiral.txt");
+  sprintf(filename,"attract_shorter_precise_c1.0_T0.1_chiral.txt");
   ofstream file;
   file.open(filename);
   file <<"#"<<" "<<"phi"<<" "<<"rho"<<" "<<"temp"<<" "<<"avU"<<" "<<"cv"<<" "<<"p"<<" "<<"p/T"<<endl;
@@ -934,13 +939,14 @@ int main(int argc, char *argv[])
   count=0;
   timer=0.0;
   int count_max=10000;
+  int count_coord=0;
   
   copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
   copy(x0,y0,z0,x,y,z,Np,x_corr,y_corr,z_corr);
   
 
 double c = 1.0;
-for(phi_final = 0.1; phi_final <= 1.4; phi_final+= 0.1){
+for(phi_final = 0.01; phi_final <= 1.4; phi_final+= 0.01){
 
      avK=0.0,avK0=0.0, p0=0.0,p=0.0,avU=0.0,avU2=0.0;
 for(;;){ // infinite loop
@@ -948,7 +954,7 @@ for(;;){ // infinite loop
     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w,list,theta1,theta2,chi,chi_pr,mu,eta,kappa,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c,&dummy,&dummy,&dummy);   
     eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w, Np, &avK0,temp,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c);
     p_bound(x, y, z, Np, L);
-cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+ //cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
     
        ///////auto update////////////////////
     calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
@@ -966,41 +972,10 @@ cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 <<
     affine_coord(x, y, z, phi, Np,dphi);  
        phi += dphi;
      //phi += 0.001*exp(-phi);   
-     L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*pow(2.,1./6.)*phi));
+     L = sqrt(pow(2.,1./2.)*pi*kappa*Np/(6.*kappa*phi));
     rho=Np/L/L/lz;
       M=(int)(L/RCHK); 
 
-
-      if(phi >= phi_p){
-    phi_p+=0.01;
-    //cout << phi_p << endl;
-    if(phi >= phi_final){
-        break;
-    }
-    else{
-    //cout <<"else" << endl;
-    for(int count=0;count<count_max;count++){//1000
-    p0=0.0;
-     calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w,list,theta1,theta2,chi,chi_pr,mu,eta,kappa,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c,&p0,&avU,&avU2);   
-    eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w, Np, &avK0,temp,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c);
-    p_bound(x, y, z, Np, L); 
-    avK+=avK0;
-    p+=p0;
-    calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
-    count_num_update++;
-    if(disp_max>0.5*0.5){
-      update(L,Lz,Np,x,y,z,M,Mz,RCHK,list);
-      disp_max=0.0;
-     copy(x_update,y_update,z_update,x,y,z,Np,x_corr,y_corr,z_corr);
-      count_num_update=0;
-    }
- 
-    cout << phi<<" "<< rho << " " << avK/count << " " << avK/count + p/count <<endl;
-    }
-    file <<phi<<" "<< rho << " " <<avK/count_max<<" "<<avU/count_max<<" "<<(avU2/count_max-avU*avU/count_max/count_max)/temp/temp<<" "<<avK/count_max + p/count_max <<" " << (avK/count_max + p/count_max)/(avK/count_max) <<endl; // to get av
-    }
-     avK=0.0,avK0=0.0, p0=0.0,p=0.0,avU=0.0,avU2=0.0;
-    }
      if(phi >= phi_final){
         break;
     }
@@ -1009,6 +984,7 @@ cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 <<
 
    int count2 = 0;
     avK=0.0,avK0=0.0, p0=0.0,p=0.0,avU=0.0,avU2=0.0;
+    count_coord++;
 
 
     for(;;){
@@ -1020,9 +996,10 @@ cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 <<
     p += p0;
 //cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
      if(count2 == 100000){
-    //if(disp_ave>disp_th2){ 
+      if(count_coord==10){ 
       output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,r1,Np); 
-         file <<phi<<" "<< rho << " " <<avK/count2<<" "<<avU/count2<<" "<<(avU2/count2-avU*avU/count2/count2)/temp/temp<<" "<<avK/count2 + p/count2 <<" " <<(avK/count2 + p/count2)/(avK/count2) <<endl; // to get av
+      count_coord=0;}
+      file <<phi<<" "<< rho << " " <<avK/count2<<" "<<avU/count2<<" "<<(avU2/count2-avU*avU/count2/count2)/temp/temp<<" "<<avK/count2 + p/count2 <<" " <<(avK/count2 + p/count2)/(avK/count2) <<endl; // to get av
       break;
       }//}
    ///////auto update////////////////////
