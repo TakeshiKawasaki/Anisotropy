@@ -103,12 +103,12 @@ int p_bound(double* x, double* y, double* z,int Np, double L) {
 
 
 
-int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,double x_corr,double y_corr,double z_corr,double L,double *theta1,double *theta2,double *r1,int Np,double temp, double c,double kappa,double phi){
+int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,double x_corr,double y_corr,double z_corr,double L,double *theta1,double *theta2,double *r1,int Np,double temp, double c,double kappa,double phi,double anc){
   int i;
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"coord_anc_mix_phi%.2f_c%.1f_T%.1f_k%.1f_N%d.dat",phi,c,temp,kappa,Np);
+  sprintf(filename,"coord_anc%.1f_mix_phi%.2f_c%.1f_T%.1f_k%.1f_N%d.dat",anc,phi,c,temp,kappa,Np);
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
@@ -635,7 +635,7 @@ int main(int argc, char *argv[])
   
   double disp_max=0.0,disp_th2 =10.;
   double disp_ave;
-  int Np = 1000;//10000;
+  int Np = 2000;//10000;
   int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//  //parameters;
@@ -648,8 +648,8 @@ int main(int argc, char *argv[])
   double kappa = 4.4; // shape anisotropy parameter
   double kappa_pr = 0.5; // energy anisotropy parameter
   double chi = (kappa*kappa-1.)/(kappa*kappa+1.); //atof(argv[1]);  
-  double c = 0.5;
-  double anc = 1.0;
+  double c = 1.0;
+  double anc = 0.0;
   
   double eta = 2.0;
   double mu = 1.0;
@@ -782,7 +782,7 @@ int main(int argc, char *argv[])
       //cout <<"disp="<< disp_ave <<"x="<<x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << " "<<"count2=" << count2<<endl;
       if(count2 == 100000){
 	//if(count_coord==1){ 
-	  output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,a,Np,temp,c,kappa,phi); 
+	output(x,y,z,nx,ny,nz,x_corr,y_corr,z_corr,L,theta1,theta2,a,Np,temp,c,kappa,phi,anc); 
 	 // count_coord=0;}
 	file <<phi<<" "<< rho << " " <<avK/count2<<" "<<avU/count2<<" "<<(avU2/count2-avU*avU/count2/count2)/temp/temp<<" "<<avK/count2 + p/count2 <<" " <<(avK/count2 + p/count2)/(avK/count2) <<endl; // to get av
 	break;
