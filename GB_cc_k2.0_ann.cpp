@@ -108,7 +108,7 @@ int output(double *x,double *y,double *z,double* nx, double* ny,double* nz,doubl
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"%s/coord_anc_k%.1f_phi%.2f_a%.1f_c%.1f_T%.1f_k%.1f_N%d_phif%.2f.dat",argv[1],kappa,phi,anc,c,temp,kappa,Np,phi_x);
+  sprintf(filename,"%s/coord_iso_k%.1f_phi%.2f_a%.1f_c%.1f_T%.1f_k%.1f_N%d_phif%.2f.dat",argv[1],kappa,phi,anc,c,temp,kappa,Np,phi_x);
   ofstream file;
   file.open(filename);
   for(i=0;i<Np;i++){
@@ -132,7 +132,7 @@ int output2(double *x,double *y,double *z,double* nx, double* ny,double* nz,doub
   static int count_file=1;
   double x1[Npm],y1[Npm],z1[Npm];
   char filename[128];   
-  sprintf(filename,"%s/coord_t%.1f_anc_k%.1f_pr_phi%.2f_a%.1f_c%.1f_T%.2f_k%.1f_N%d_phif%.2f.dat",argv[1],time,kappa,phi,anc,c,temp,kappa,Np,phi_x);
+  sprintf(filename,"%s/coord_t%.1f_iso_k%.1f_pr_phi%.2f_a%.1f_c%.1f_T%.2f_k%.1f_N%d_phif%.2f.dat",argv[1],time,kappa,phi,anc,c,temp,kappa,Np,phi_x);
   ofstream file2;
   file2.open(filename);
   for(i=0;i<Np;i++){
@@ -256,7 +256,7 @@ void update(double L,double Lz,int Np,double *x,double *y,double *z,int M,int Mz
   int l,m,n;
   double dx,dy,dz,r;
   
-  int (*map)[Npm]=new int[M*M*Mz][Npm];
+  static int (*map)[Npm]=new int[M*M*Mz][Npm];
   for(k=0;k<Mz;k++)
     for(j=0;j<M;j++)
       for(i=0;i<M;i++)
@@ -269,7 +269,7 @@ void update(double L,double Lz,int Np,double *x,double *y,double *z,int M,int Mz
     for(n=nz-1;n<=nz+1;n++)
       for(m=ny-1;m<=ny+1;m++)
 	for(l=nx-1;l<=nx+1;l++){
-	  map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][0] +1]=i; 
+	  map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][0]+1]=i; 
 	  map[f(l,M)+M*f(m,M)+M*M*f(n,Mz)][0]++;
         }
   } 
@@ -486,6 +486,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    r2 = dx*dx + dy*dy + dz*dz;
 	    r3 = r2*r;
 	    r4 = r2*r2;
+         if(r2< 5.061296*5.061296){ 
 	    
 	    ri = dx*nx[i] + dy*ny[i] + dz*nz[i];
 	    rj = dx*nx[list[i][j]] + dy*ny[list[i][j]] + dz*nz[list[i][j]];
@@ -499,7 +500,7 @@ int calc_force(double* x, double* y, double* z, double L, double* nx, double* ny
 	    aij_pr = aij/sqrt(1.-(chi/2./r2)*(R2p+R2n));
 	    cut = pow(2.,1./6.)-1.+aij_pr/aij;
 	    
-	    if(r2< cut*cut){    
+	    //if(r2< cut*cut){    
 	      dij = dx*(ny[i]*nz[list[i][j]] - nz[i]*ny[list[i][j]]) + dy*(nz[i]*nx[list[i][j]] - nx[i]*nz[list[i][j]]) + dz*(nx[i]*ny[list[i][j]] - ny[i]*nx[list[i][j]]);
 	      
 	      R2p_pr =(ri+rj)*(ri+rj)/(1+chi_pr*cij);
@@ -664,18 +665,18 @@ int main(int argc, char *argv[])
   int count_th=200;
   //double disp_th2 = 180;
   double dt =0.0001;//0.0001;//  //parameters;
-  double temp = 5.0;
+  double temp = 2.0;//5.0;
   double Th;
-  double phi=0.005;
+  double phi=0.01;
   double dphi = 0.0005;
   double phi_final;
-  double phi_x = 0.76;//atof(argv[1]); 
+  double phi_x = 0.69;//atof(argv[1]); 
   
   double kappa = 2.0; // shape anisotropy parameter
   double kappa_pr = 0.5; // energy anisotropy parameter
   double chi = (kappa*kappa-1.)/(kappa*kappa+1.); //atof(argv[1]);  
-  double c = 1.5;
-  double anc =atof(argv[1]); 
+  double c = 3.0;
+  double anc =2.5;//atof(argv[1]); 
   double time=0.0;
 
   double eta = 2.0;
@@ -696,7 +697,7 @@ int main(int argc, char *argv[])
   cout << "L=" << L <<" "<< "M="<<M <<endl;
   
   double* x, * y, *z,* x0, * y0, *z0,* vx, * vy,*vz, * a, * kx, * ky,*kz, * knx,* kny,* knz, * kx_w, * ky_w,*kz_w, * knx_w,* kny_w,* knz_w, * nx,* ny,* nz, * nx_pr,* ny_pr,* nz_pr,*x_update,*y_update,*z_update, *theta1, *theta2 ,*omega,*r1,*kw,* kx_c, * ky_c,*kz_c, * knx_c,* kny_c,* knz_c;
-  int (*list)[Pm]=new int[Npm][Pm];
+  int (*list)[Pm]=new int[Np][Pm];
   
   x = new double[Np];
   y = new double[Np];
@@ -777,7 +778,7 @@ int main(int argc, char *argv[])
 	calc_force(x, y, z, L, nx, ny, nz, Np, a, kx, ky, kz, knx,kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w,list,theta1,theta2,chi,chi_pr,mu,eta,kappa,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c,&dummy,&dummy,&dummy,anc);   
 	eq_motion(x, y,z, theta1, theta2,vx, vy, vz, nx, ny, nz, nx_pr, ny_pr, nz_pr, omega, dt, kx, ky, kz, knx, kny,knz,kw,kx_w, ky_w, kz_w, knx_w,kny_w,knz_w, Np, &avK0,temp,kx_c, ky_c, kz_c, knx_c,kny_c,knz_c,c);
 	p_bound(x, y, z, Np, L);
-	//cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
+	cout <<"disp= "<< disp_ave <<" " << "x= "<<" " << x[1]<<" "<< "temp=" << avK0 << "L=" << L <<" "<< "M="<<M << " "<< "phi = " << phi << "count = " << count <<endl;
 	
 	///////auto update////////////////////
 	calc_disp(&disp_max,&disp_ave,x,y,z,x_update,y_update,z_update,x0,y0,z0,Np,L,x_corr,y_corr,z_corr);
